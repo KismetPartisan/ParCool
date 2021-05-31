@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "parcool",
+    "name": "ParCool!",
+    "description": "This enable us act like parkour players.\n    Enjoy Minecraft with cool actions!\n    If you need more information, use \"/parcool giveTutorialBook\"",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/parcool",
+    "updateUrl": "https://www.curseforge.com/minecraft/mc-mods/parcool",
+    "authorList": [
+      "alRex-U"
+    ],
+    "credits": "Thanks for Java, and Developers of Minecraft and Minecraft Forge",
+    "logoFile": "parcool_logo.png",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

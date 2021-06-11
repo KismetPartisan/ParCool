@@ -5,9 +5,9 @@ import com.alrex.parcool.client.input.KeyBindings;
 import com.alrex.parcool.common.capability.ICrawl;
 import com.alrex.parcool.common.capability.IFastRunning;
 import com.alrex.parcool.common.capability.IStamina;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class FastRunning implements IFastRunning {
 	private boolean fastRunning = false;
@@ -24,14 +24,14 @@ public class FastRunning implements IFastRunning {
 		this.fastRunning = fastRunning;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canFastRunning(PlayerEntity player) {
+	public boolean canFastRunning(EntityPlayer player) {
 		IStamina stamina = IStamina.get(player);
 		ICrawl crawl = ICrawl.get(player);
 		if (stamina == null || crawl == null) return false;
 
-		return !stamina.isExhausted() && ParCoolConfig.CONFIG_CLIENT.canFastRunning.get() && !crawl.isCrawling() && !crawl.isSliding() && KeyBindings.getKeyFastRunning().isKeyDown() && !player.isInWaterOrBubbleColumn();
+		return !stamina.isExhausted() && ParCoolConfig.client.canFastRunning && !crawl.isCrawling() && !crawl.isSliding() && KeyBindings.getKeyFastRunning().isKeyDown() && !player.isInWater();
 	}
 
 	@Override

@@ -1,20 +1,21 @@
 package com.alrex.parcool.common.capability.storage;
 
 import com.alrex.parcool.common.capability.IDodge;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 
 public class DodgeStorage implements Capability.IStorage<IDodge> {
-	@Override
-	public void readNBT(Capability<IDodge> capability, IDodge instance, Direction side, INBT nbt) {
-	}
-
 	@Nullable
 	@Override
-	public INBT writeNBT(Capability<IDodge> capability, IDodge instance, Direction side) {
+	public NBTBase writeNBT(Capability<IDodge> capability, IDodge instance, EnumFacing side) {
 		return null;
+	}
+
+	@Override
+	public void readNBT(Capability<IDodge> capability, IDodge instance, EnumFacing side, NBTBase nbt) {
+
 	}
 }

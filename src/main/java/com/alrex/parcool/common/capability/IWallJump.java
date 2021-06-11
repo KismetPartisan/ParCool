@@ -1,27 +1,25 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IWallJump {
 	public double getJumpPower();
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canWallJump(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canWallJump(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public Vector3d getJumpDirection(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public Vec3d getJumpDirection(EntityPlayer player);
 
 	public int getStaminaConsumption();
 
-	public static IWallJump get(PlayerEntity entity) {
-		LazyOptional<IWallJump> optional = entity.getCapability(Capabilities.WALL_JUMP_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static IWallJump get(EntityPlayer entity) {
+		IWallJump wallJump = entity.getCapability(Capabilities.WALL_JUMP_CAPABILITY, null);
+		return wallJump;
 	}
 
 }

@@ -5,24 +5,24 @@ import com.alrex.parcool.common.capability.IGrabCliff;
 import com.alrex.parcool.common.capability.IStamina;
 import com.alrex.parcool.common.network.ResetFallDistanceMessage;
 import com.alrex.parcool.common.network.SyncGrabCliffMessage;
+import com.alrex.parcool.utilities.PlayerUtils;
 import com.alrex.parcool.utilities.VectorUtil;
 import com.alrex.parcool.utilities.WorldUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GrabCliffLogic {
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event) {
 		if (event.phase != TickEvent.Phase.END) return;
-		if (event.side == LogicalSide.SERVER) return;
-		PlayerEntity player = event.player;
+		if (event.side == Side.SERVER) return;
+		EntityPlayer player = event.player;
 		IStamina stamina = IStamina.get(player);
 		IGrabCliff grabCliff = IGrabCliff.get(player);
 		if (stamina == null || grabCliff == null) return;
@@ -41,8 +41,8 @@ public class GrabCliffLogic {
 		}
 
 		if (grabCliff.isGrabbing()) {
-			Vector3d vec = player.getMotion();
-			player.setMotion(vec.getX() / 10, vec.getY() > 0.1 ? vec.getY() / 10 : 0, vec.getZ() / 10);
+			Vec3d vec = PlayerUtils.getVelocity(player);
+			PlayerUtils.setVelocity(player, new Vec3d(vec.x / 10, vec.y > 0.1 ? vec.y / 10 : 0, vec.z / 10));
 			stamina.consume(grabCliff.getStaminaConsumptionGrab());
 		}
 		if (grabCliff.canJumpOnCliff(player)) {
@@ -51,11 +51,11 @@ public class GrabCliffLogic {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onRender(TickEvent.RenderTickEvent event) {
 		if (event.phase != TickEvent.Phase.END) return;
-		ClientPlayerEntity player = Minecraft.getInstance().player;
+		EntityPlayerSP player = Minecraft.getInstance().player;
 		if (player == null) return;
 		if (!ParCool.isActive()) return;
 
@@ -63,8 +63,8 @@ public class GrabCliffLogic {
 		if (grabCliff == null) return;
 
 		if (grabCliff.isGrabbing()) {
-			Vector3d wall = WorldUtil.getWall(player);
-			Vector3d look = player.getLookVec();
+			Vec3d wall = WorldUtil.getWall(player);
+			Vec3d look = player.getLookVec();
 			if (wall != null)
 				player.rotationYaw = (float) VectorUtil.toYawDegree(wall.normalize().add(look.normalize()));
 		}

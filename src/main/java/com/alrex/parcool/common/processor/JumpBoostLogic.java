@@ -5,23 +5,23 @@ import com.alrex.parcool.common.capability.ICatLeap;
 import com.alrex.parcool.common.capability.ICrawl;
 import com.alrex.parcool.common.capability.IStamina;
 import com.alrex.parcool.common.network.SyncCatLeapMessage;
+import com.alrex.parcool.utilities.PlayerUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class JumpBoostLogic {
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event) {
-		if (event.side == LogicalSide.SERVER || event.phase != TickEvent.Phase.START) return;
-		PlayerEntity player = event.player;
+		if (event.side == Side.SERVER || event.phase != TickEvent.Phase.START) return;
+		EntityPlayer player = event.player;
 		ICatLeap catLeap = ICatLeap.get(player);
 		IStamina stamina = IStamina.get(player);
 		if (catLeap == null || stamina == null) return;
@@ -33,27 +33,27 @@ public class JumpBoostLogic {
 
 		boolean oldLeaping = catLeap.isLeaping();
 		if (catLeap.canCatLeap(player)) {
-			Vector3d motionVec = player.getMotion();
-			Vector3d vec = new Vector3d(motionVec.getX(), 0, motionVec.getZ()).normalize();
-			player.setMotion(vec.getX(), catLeap.getBoostValue(player), vec.getZ());
+			Vec3d motionVec = PlayerUtils.getVelocity(player);
+			Vec3d vec = new Vec3d(motionVec.x, 0, motionVec.z).normalize();
+			PlayerUtils.setVelocity(player, new Vec3d(vec.x, catLeap.getBoostValue(player), vec.z));
 			stamina.consume(catLeap.getStaminaConsumption());
 			catLeap.setLeaping(true);
 			catLeap.setReady(false);
-		} else if (catLeap.isLeaping() && (player.collidedHorizontally || player.collidedVertically || player.isInWaterOrBubbleColumn())) {
+		} else if (catLeap.isLeaping() && (player.collidedHorizontally || player.collidedVertically || player.isInWater())) {
 			catLeap.setLeaping(false);
 		}
 		catLeap.setReady(catLeap.canReadyLeap(player));
 		if (oldLeaping != catLeap.isLeaping()) SyncCatLeapMessage.sync(player);
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
 		Entity entity = event.getEntity();
-		if (!(entity instanceof PlayerEntity)) return;
-		PlayerEntity playerEntity = (PlayerEntity) entity;
+		if (!(entity instanceof EntityPlayer)) return;
+		EntityPlayer EntityPlayer = (EntityPlayer) entity;
 
-		ClientPlayerEntity player = Minecraft.getInstance().player;
+		EntityPlayerSP player = Minecraft.getInstance().player;
 		if (player != entity) return;
 		if (!ParCool.isActive()) return;
 
@@ -62,13 +62,13 @@ public class JumpBoostLogic {
 		if (crawl == null || stamina == null) return;
 
 		if (stamina.isExhausted()) {
-			Vector3d vec = player.getMotion();
-			player.setMotion(vec.getX(), 0.3, vec.getZ());
+			Vec3d vec = PlayerUtils.getVelocity(player);
+			PlayerUtils.setVelocity(player, new Vec3d(vec.x, 0.3, vec.z));
 			return;
 		}
 		if (crawl.isSliding()) {
-			Vector3d vec = player.getMotion();
-			player.setMotion(vec.getX(), 0, vec.getZ());
+			Vec3d vec = PlayerUtils.getVelocity(player);
+			PlayerUtils.setVelocity(player, new Vec3d(vec.x, 0, vec.z));
 		}
 	}
 }

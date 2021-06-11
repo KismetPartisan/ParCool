@@ -1,17 +1,16 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IRoll {
-	@OnlyIn(Dist.CLIENT)
-	public boolean canRollReady(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canRollReady(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canContinueRollReady(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canContinueRollReady(EntityPlayer player);
 
 	public boolean isRollReady();
 
@@ -29,10 +28,9 @@ public interface IRoll {
 
 	public int getRollAnimateTime();//Don't return 0;
 
-	public static IRoll get(PlayerEntity entity) {
-		LazyOptional<IRoll> optional = entity.getCapability(Capabilities.ROLL_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static IRoll get(EntityPlayer entity) {
+		IRoll roll = entity.getCapability(Capabilities.ROLL_CAPABILITY, null);
+		return roll;
 	}
 
 }

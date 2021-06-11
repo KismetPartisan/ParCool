@@ -1,28 +1,27 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
 public interface IDodge {
 	enum DodgeDirection {Left, Right, Back, Front}
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canDodge(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canDodge(EntityPlayer player);
 
 	public void setDirection(DodgeDirection direction);
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Nullable
-	public Vector3d getAndSetDodgeDirection(PlayerEntity player);
+	public Vec3d getAndSetDodgeDirection(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canContinueDodge(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canContinueDodge(EntityPlayer player);
 
 	public boolean isDodging();
 
@@ -37,9 +36,8 @@ public interface IDodge {
 
 	public int getStaminaConsumption();
 
-	public static IDodge get(PlayerEntity entity) {
-		LazyOptional<IDodge> optional = entity.getCapability(Capabilities.DODGE_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static IDodge get(EntityPlayer entity) {
+		IDodge dodge = entity.getCapability(Capabilities.DODGE_CAPABILITY, null);
+		return dodge;
 	}
 }

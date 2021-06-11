@@ -1,90 +1,79 @@
 package com.alrex.parcool.proxy;
 
 import com.alrex.parcool.common.network.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@OnlyIn(Dist.DEDICATED_SERVER)
+@SideOnly(Side.SERVER)
 public class ServerProxy extends CommonProxy {
 	@Override
-	public void registerMessages(SimpleChannel instance) {
+	public void registerMessages(SimpleNetworkWrapper instance) {
 		instance.registerMessage(
-				0,
 				ResetFallDistanceMessage.class,
-				ResetFallDistanceMessage::encode,
-				ResetFallDistanceMessage::decode,
-				ResetFallDistanceMessage::handle
+				ResetFallDistanceMessage.class,
+				0,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				1,
 				SetActionPossibilityMessage.class,
-				SetActionPossibilityMessage::encode,
-				SetActionPossibilityMessage::decode,
-				SetActionPossibilityMessage::handle
+				SetActionPossibilityMessage.class,
+				1,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				2,
 				ShowActionPossibilityMessage.class,
-				ShowActionPossibilityMessage::encode,
-				ShowActionPossibilityMessage::decode,
-				ShowActionPossibilityMessage::handle
+				ShowActionPossibilityMessage.class,
+				2,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				3,
+				StartRollMessage::handleServer,
 				StartRollMessage.class,
-				StartRollMessage::encode,
-				StartRollMessage::decode,
-				StartRollMessage::handleServer
+				3,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				4,
+				SyncCatLeapMessage::handleServer,
 				SyncCatLeapMessage.class,
-				SyncCatLeapMessage::encode,
-				SyncCatLeapMessage::decode,
-				SyncCatLeapMessage::handleServer
+				4,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				5,
+				SyncCrawlMessage::handleServer,
 				SyncCrawlMessage.class,
-				SyncCrawlMessage::encode,
-				SyncCrawlMessage::decode,
-				SyncCrawlMessage::handleServer
+				5,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				6,
+				SyncDodgeMessage::handleServer,
 				SyncDodgeMessage.class,
-				SyncDodgeMessage::encode,
-				SyncDodgeMessage::decode,
-				SyncDodgeMessage::handleServer
+				6,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				7,
+				SyncFastRunningMessage::handleServer,
 				SyncFastRunningMessage.class,
-				SyncFastRunningMessage::encode,
-				SyncFastRunningMessage::decode,
-				SyncFastRunningMessage::handleServer
+				7,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				8,
+				SyncGrabCliffMessage::handleServer,
 				SyncGrabCliffMessage.class,
-				SyncGrabCliffMessage::encode,
-				SyncGrabCliffMessage::decode,
-				SyncGrabCliffMessage::handleServer
+				8,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				9,
+				SyncRollReadyMessage::handleServer,
 				SyncRollReadyMessage.class,
-				SyncRollReadyMessage::encode,
-				SyncRollReadyMessage::decode,
-				SyncRollReadyMessage::handleServer
+				9,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				10,
+				SyncStaminaMessage::handleServer,
 				SyncStaminaMessage.class,
-				SyncStaminaMessage::encode,
-				SyncStaminaMessage::decode,
-				SyncStaminaMessage::handleServer
+				10,
+				Side.SERVER
 		);
 	}
 }

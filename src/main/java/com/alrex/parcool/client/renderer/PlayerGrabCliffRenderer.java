@@ -1,36 +1,28 @@
 package com.alrex.parcool.client.renderer;
 
 import com.alrex.parcool.common.capability.IGrabCliff;
-import com.alrex.parcool.utilities.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 
 public class PlayerGrabCliffRenderer {
 	public static void onRender(RenderPlayerEvent.Pre event) {
-		if (!(event.getPlayer() instanceof AbstractClientPlayerEntity)) return;
-		AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) event.getPlayer();
+		if (!(event.getEntityPlayer() instanceof EntityPlayerSP)) return;
+		EntityPlayerSP player = (EntityPlayerSP) event.getEntityPlayer();
 
 		IGrabCliff grabCliff = IGrabCliff.get(player);
 		if (grabCliff == null) return;
 
 		if (grabCliff.isGrabbing()) {
-			ClientPlayerEntity mainPlayer = Minecraft.getInstance().player;
+			/*
+			EntityPlayerSP mainPlayer = Minecraft.getInstance().player;
 			if (mainPlayer == null) return;
 
-			PlayerRenderer renderer = event.getRenderer();
-			PlayerModel<AbstractClientPlayerEntity> model = renderer.getEntityModel();
+			RenderPlayer renderer = event.getRenderer();
+			ModelPlayer model = renderer.func_177087_b();
 
-			event.getMatrixStack().push();
-			Vector3d posOffset = RenderUtil.getPlayerOffset(mainPlayer, player, event.getPartialRenderTick());
-			event.getMatrixStack().translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
+			GL11.glPushMatrix();
+			Vec3d posOffset = RenderUtil.getPlayerOffset(mainPlayer, player, event.getPartialRenderTick());
+			GL11.glTranslated(posOffset.x, posOffset.y, posOffset.z);
 
 			model.bipedRightArm.showModel = true;
 			RenderUtil.rotateRightArm(player, model.bipedRightArm,
@@ -83,11 +75,13 @@ public class PlayerGrabCliffRenderer {
 					light,
 					OverlayTexture.NO_OVERLAY
 			);
-			event.getMatrixStack().pop();
+			GL11.glPopMatrix();
 			model.bipedRightArm.showModel = false;
 			model.bipedRightArmwear.showModel = false;
 			model.bipedLeftArm.showModel = false;
 			model.bipedLeftArmwear.showModel = false;
+
+			 */
 		}
 	}
 }

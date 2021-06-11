@@ -1,17 +1,16 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IGrabCliff {
-	@OnlyIn(Dist.CLIENT)
-	public boolean canGrabCliff(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canGrabCliff(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canJumpOnCliff(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canJumpOnCliff(EntityPlayer player);
 
 	public boolean isGrabbing();
 
@@ -27,10 +26,9 @@ public interface IGrabCliff {
 
 	public int getStaminaConsumptionClimbUp();
 
-	public static IGrabCliff get(PlayerEntity entity) {
-		LazyOptional<IGrabCliff> optional = entity.getCapability(Capabilities.GRAB_CLIFF_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static IGrabCliff get(EntityPlayer entity) {
+		IGrabCliff grabCliff = entity.getCapability(Capabilities.GRAB_CLIFF_CAPABILITY, null);
+		return grabCliff;
 	}
 
 }

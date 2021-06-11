@@ -1,18 +1,18 @@
 package com.alrex.parcool.client.renderer;
 
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
-@OnlyIn(Dist.CLIENT)
+@SideOnly(Side.CLIENT)
 public class PlayerRenderEventHandler {
 	@SubscribeEvent
 	public static void onPlayerRenderPre(RenderPlayerEvent.Pre event) {
-		event.getMatrixStack().push();
+		GL11.glPushMatrix();
 
 		PlayerDodgeRenderer.onRender(event);
 		PlayerRollRenderer.onRender(event);
@@ -21,10 +21,10 @@ public class PlayerRenderEventHandler {
 
 	@SubscribeEvent
 	public static void onPlayerRenderPost(RenderPlayerEvent.Post event) {
-		PlayerRenderer renderer = event.getRenderer();
-		PlayerModel<AbstractClientPlayerEntity> model = renderer.getEntityModel();
+		RenderPlayer renderer = event.getRenderer();
+		ModelPlayer model = renderer.func_177087_b();
 
-		event.getMatrixStack().pop();
+		GL11.glPopMatrix();
 		model.bipedRightArm.showModel = true;
 		model.bipedLeftArm.showModel = true;
 		model.bipedLeftLeg.showModel = true;

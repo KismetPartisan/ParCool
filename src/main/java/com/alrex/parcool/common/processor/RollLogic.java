@@ -4,27 +4,27 @@ import com.alrex.parcool.common.capability.IRoll;
 import com.alrex.parcool.common.capability.IStamina;
 import com.alrex.parcool.common.network.StartRollMessage;
 import com.alrex.parcool.common.network.SyncRollReadyMessage;
+import com.alrex.parcool.utilities.PlayerUtils;
 import com.alrex.parcool.utilities.VectorUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class RollLogic {
-	private static Vector3d rollDirection = null;
+	private static Vec3d rollDirection = null;
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	public static void rollStart() {
-		ClientPlayerEntity player = Minecraft.getInstance().player;
+		EntityPlayerSP player = Minecraft.getInstance().player;
 		if (player == null) return;
 
 		IRoll roll = IRoll.get(player);
@@ -33,10 +33,10 @@ public class RollLogic {
 		roll.setRollReady(false);
 		roll.setRolling(true);
 
-		Vector3d lookVec = player.getLookVec();
-		Vector3d motionVec = player.getMotion();
-		lookVec = new Vector3d(lookVec.getX(), 0, lookVec.getZ()).normalize();
-		motionVec = new Vector3d(motionVec.getX(), 0, motionVec.getZ());
+		Vec3d lookVec = player.getLookVec();
+		Vec3d motionVec = PlayerUtils.getVelocity(player);
+		lookVec = new Vec3d(lookVec.x, 0, lookVec.z).normalize();
+		motionVec = new Vec3d(motionVec.x, 0, motionVec.z);
 		double speed = motionVec.length();
 		if (speed < 0.8) speed = 0.8;
 		rollDirection = lookVec.add(motionVec.normalize()).normalize().scale(speed / 1.4);
@@ -45,8 +45,8 @@ public class RollLogic {
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event) {
 		if (event.phase != TickEvent.Phase.END) return;
-		if (event.side != LogicalSide.CLIENT) return;
-		PlayerEntity player = event.player;
+		if (event.side != Side.CLIENT) return;
+		EntityPlayer player = event.player;
 		IStamina stamina = IStamina.get(player);
 		IRoll roll = IRoll.get(player);
 		if (stamina == null || roll == null) return;
@@ -68,8 +68,8 @@ public class RollLogic {
 		if (roll.isRolling()) {
 			if (rollDirection == null) return;
 			rollDirection.scale(0.7);
-			Vector3d motion = player.getMotion();
-			player.setMotion(rollDirection.getX(), motion.getY(), rollDirection.getZ());
+			Vec3d motion = PlayerUtils.getVelocity(player);
+			PlayerUtils.setVelocity(player, new Vec3d(rollDirection.x, motion.y, rollDirection.z));
 		}
 		if (roll.getRollingTime() >= roll.getRollAnimateTime()) {
 			roll.setRolling(false);
@@ -77,19 +77,19 @@ public class RollLogic {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onRender(RenderPlayerEvent event) {
-		if (event.getPlayer() != Minecraft.getInstance().player) return;
+		if (event.getEntityPlayer() != Minecraft.getInstance().player) return;
 
-		if (rollDirection != null) event.getPlayer().rotationYaw = (float) VectorUtil.toYawDegree(rollDirection);
+		if (rollDirection != null) event.getEntityPlayer().rotationYaw = (float) VectorUtil.toYawDegree(rollDirection);
 	}
 
 	@SubscribeEvent
 	public static void onDamage(LivingDamageEvent event) {
-		if (!(event.getEntityLiving() instanceof ServerPlayerEntity) || !event.getSource().getDamageType().equals(DamageSource.FALL.getDamageType()))
+		if (!(event.getEntityLiving() instanceof EntityPlayerMP) || !event.getSource().getDamageType().equals(DamageSource.FALL.getDamageType()))
 			return;
-		ServerPlayerEntity player = (ServerPlayerEntity) event.getEntityLiving();
+		EntityPlayerMP player = (EntityPlayerMP) event.getEntityLiving();
 
 		IRoll roll = IRoll.get(player);
 		if (roll == null) return;

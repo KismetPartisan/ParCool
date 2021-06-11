@@ -6,10 +6,10 @@ import com.alrex.parcool.common.capability.IGrabCliff;
 import com.alrex.parcool.common.capability.IStamina;
 import com.alrex.parcool.common.capability.IWallJump;
 import com.alrex.parcool.utilities.WorldUtil;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
@@ -19,30 +19,30 @@ public class WallJump implements IWallJump {
 		return 0.3;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canWallJump(PlayerEntity player) {
+	public boolean canWallJump(EntityPlayer player) {
 		IStamina stamina = IStamina.get(player);
 		IGrabCliff grabCliff = IGrabCliff.get(player);
 		if (stamina == null || grabCliff == null) return false;
 
-		return !stamina.isExhausted() && ParCoolConfig.CONFIG_CLIENT.canWallJump.get() && !player.collidedVertically && !player.isInWaterOrBubbleColumn() && !player.isElytraFlying() && !player.abilities.isFlying && !grabCliff.isGrabbing() && KeyRecorder.keyJumpState.isPressed() && WorldUtil.getWall(player) != null;
+		return !stamina.isExhausted() && ParCoolConfig.client.canWallJump && !player.collidedVertically && !player.isInWater() && !player.isElytraFlying() && !player.abilities.isFlying && !grabCliff.isGrabbing() && KeyRecorder.keyJumpState.isPressed() && WorldUtil.getWall(player) != null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
 	@Nullable
-	public Vector3d getJumpDirection(PlayerEntity player) {
-		Vector3d wall = WorldUtil.getWall(player);
+	public Vec3d getJumpDirection(EntityPlayer player) {
+		Vec3d wall = WorldUtil.getWall(player);
 		if (wall == null) return null;
 
-		Vector3d lookVec = player.getLookVec();
-		Vector3d vec = new Vector3d(lookVec.getX(), 0, lookVec.getZ()).normalize();
+		Vec3d lookVec = player.getLookVec();
+		Vec3d vec = new Vec3d(lookVec.x, 0, lookVec.z).normalize();
 
-		Vector3d value;
+		Vec3d value;
 
 		if (wall.dotProduct(vec) > 0) {//To Wall
-			double dot = vec.inverse().dotProduct(wall);
+			double dot = new Vec3d(-vec.x, 0, -vec.z).dotProduct(wall);
 			value = vec.add(wall.scale(2 * dot / wall.length())); // Perfect.
 		} else {//back on Wall
 			value = vec;

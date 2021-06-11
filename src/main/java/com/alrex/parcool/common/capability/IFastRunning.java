@@ -1,14 +1,13 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IFastRunning {
-	@OnlyIn(Dist.CLIENT)
-	public boolean canFastRunning(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canFastRunning(EntityPlayer player);
 
 	public boolean isFastRunning();
 
@@ -22,10 +21,9 @@ public interface IFastRunning {
 
 	public int getStaminaConsumption();
 
-	public static IFastRunning get(PlayerEntity entity) {
-		LazyOptional<IFastRunning> optional = entity.getCapability(Capabilities.FAST_RUNNING_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static IFastRunning get(EntityPlayer entity) {
+		IFastRunning fastRunning = entity.getCapability(Capabilities.FAST_RUNNING_CAPABILITY, null);
+		return fastRunning;
 	}
 
 }

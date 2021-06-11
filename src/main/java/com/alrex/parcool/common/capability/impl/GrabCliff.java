@@ -5,30 +5,31 @@ import com.alrex.parcool.client.input.KeyBindings;
 import com.alrex.parcool.client.input.KeyRecorder;
 import com.alrex.parcool.common.capability.IGrabCliff;
 import com.alrex.parcool.common.capability.IStamina;
+import com.alrex.parcool.utilities.PlayerUtils;
 import com.alrex.parcool.utilities.WorldUtil;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GrabCliff implements IGrabCliff {
 	private boolean grabbing = false;
 	private int grabbingTime = 0;
 	private int notGrabbingTime = 0;
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canGrabCliff(PlayerEntity player) {
+	public boolean canGrabCliff(EntityPlayer player) {
 		IStamina stamina = IStamina.get(player);
 		if (stamina == null) return false;
 
-		double ySpeed = player.getMotion().y;
-		return !stamina.isExhausted() && ySpeed < 0.2 && ParCoolConfig.CONFIG_CLIENT.canGrabCliff.get() && KeyBindings.getKeyGrabWall().isKeyDown() && player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty() && WorldUtil.existsGrabbableWall(player);
+		double ySpeed = PlayerUtils.getVelocity(player).y;
+		return !stamina.isExhausted() && ySpeed < 0.2 && ParCoolConfig.client.canGrabCliff && KeyBindings.getKeyGrabWall().isKeyDown() && player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty() && WorldUtil.existsGrabbableWall(player);
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canJumpOnCliff(PlayerEntity player) {
-		return grabbing && ParCoolConfig.CONFIG_CLIENT.canGrabCliff.get() && grabbingTime > 3 && KeyRecorder.keyJumpState.isPressed();
+	public boolean canJumpOnCliff(EntityPlayer player) {
+		return grabbing && ParCoolConfig.client.canGrabCliff && grabbingTime > 3 && KeyRecorder.keyJumpState.isPressed();
 	}
 
 	@Override

@@ -6,10 +6,10 @@ import com.alrex.parcool.client.renderer.PlayerRenderEventHandler;
 import com.alrex.parcool.common.event.EventActivateParCool;
 import com.alrex.parcool.common.event.EventAttachCapability;
 import com.alrex.parcool.common.processor.*;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 public class EventBusForgeRegistry {
-	public static void register(IEventBus bus) {
+	public static void register(EventBus bus) {
 		bus.register(EventAttachCapability.class);
 
 		bus.register(CrawlLogic.class);
@@ -23,7 +23,7 @@ public class EventBusForgeRegistry {
 		bus.register(WallJumpLogic.class);
 	}
 
-	public static void registerClient(IEventBus bus) {
+	public static void registerClient(EventBus bus) {
 		bus.register(StaminaHUD.class);
 		bus.register(KeyRecorder.class);
 		bus.register(PlayerRenderEventHandler.class);

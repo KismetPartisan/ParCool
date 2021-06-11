@@ -5,34 +5,34 @@ import com.alrex.parcool.client.input.KeyBindings;
 import com.alrex.parcool.common.capability.ICatLeap;
 import com.alrex.parcool.common.capability.IFastRunning;
 import com.alrex.parcool.common.capability.IStamina;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CatLeap implements ICatLeap {
 	private boolean leaping = false;
 	private boolean ready = false;
 	private int readyTime = 0;
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canCatLeap(PlayerEntity player) {
+	public boolean canCatLeap(EntityPlayer player) {
 		IStamina stamina = IStamina.get(player);
 		if (stamina == null) return false;
-		return player.collidedVertically && ParCoolConfig.CONFIG_CLIENT.canCatLeap.get() && !stamina.isExhausted() && ready && readyTime < 10 && !KeyBindings.getKeySneak().isKeyDown();
+		return player.collidedVertically && ParCoolConfig.client.canCatLeap && !stamina.isExhausted() && ready && readyTime < 10 && !KeyBindings.getKeySneak().isKeyDown();
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canReadyLeap(PlayerEntity player) {
+	public boolean canReadyLeap(EntityPlayer player) {
 		IFastRunning fastRunning = IFastRunning.get(player);
 		if (fastRunning == null) return false;
 		return (fastRunning.getNotRunningTime() < 10 && KeyBindings.getKeySneak().isKeyDown()) || (ready && KeyBindings.getKeySneak().isKeyDown() && readyTime < 10);
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public double getBoostValue(PlayerEntity player) {
+	public double getBoostValue(EntityPlayer player) {
 		return 0.49;
 	}
 

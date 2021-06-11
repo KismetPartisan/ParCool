@@ -1,36 +1,38 @@
 package com.alrex.parcool.client.particle;
 
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.vector.Vector3d;
+import com.alrex.parcool.utilities.PlayerUtils;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import java.util.Random;
 
 //only in Client
 public class ParticleProvider {
-	public static void spawnEffectActivateParCool(AbstractClientPlayerEntity player) {
-		ClientWorld world = player.worldClient;
-		final double x = player.getPosX();
-		final double y = player.getPosY() + 0.1;
-		final double z = player.getPosZ();
+	public static void spawnEffectActivateParCool(EntityPlayer player) {
+		World world = player.getEntityWorld();
+		final double x = player.posX;
+		final double y = player.posY + 0.1;
+		final double z = player.posZ;
 
-		Vector3d motion = player.getMotion();
-		Vector3d vec = new Vector3d(0, 0, 0.3);
+		Vec3d motion = PlayerUtils.getVelocity(player);
+		Vec3d vec = new Vec3d(0, 0, 0.3);
 		for (int i = 0; i < 16; i++) {
-			Vector3d direction = vec.rotateYaw((float) (Math.PI / 8 * i)).add(motion);
-			world.addParticle(ParticleTypes.LARGE_SMOKE, x, y, z, direction.getX(), 0, direction.getZ());
+			Vec3d direction = vec.rotateYaw((float) (Math.PI / 8 * i)).add(motion);
+			world.func_175688_a(EnumParticleTypes.SMOKE_LARGE,
+					x, y, z, direction.x, direction.y, direction.z);
 		}
 	}
 
-	public static void spawnEffectSweat(AbstractClientPlayerEntity player) {
-		ClientWorld world = player.worldClient;
+	public static void spawnEffectSweat(EntityPlayer player) {
+		World world = player.getEntityWorld();
 		Random random = player.getRNG();
-		final double x = player.getPosX();
-		final double y = player.getPosY();
-		final double z = player.getPosZ();
-		world.addParticle(
-				ParticleTypes.DRIPPING_WATER,
+		final double x = player.posX;
+		final double y = player.posY;
+		final double z = player.posZ;
+		world.func_175688_a(
+				EnumParticleTypes.DRIP_WATER,
 				x + random.nextInt(10) / 10d - 0.5,
 				y + random.nextInt(20) / 10d,
 				z + random.nextInt(10) / 10d - 0.5,

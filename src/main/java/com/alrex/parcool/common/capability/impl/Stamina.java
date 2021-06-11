@@ -22,7 +22,7 @@ public class Stamina implements IStamina {
 
 	@Override
 	public int getMaxStamina() {
-		return ParCoolConfig.CONFIG_CLIENT.maxStamina.get();
+		return ParCoolConfig.client.maxStamina;
 	}
 
 	@Override

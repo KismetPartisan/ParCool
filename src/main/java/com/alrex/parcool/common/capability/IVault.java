@@ -1,14 +1,13 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IVault {
-	@OnlyIn(Dist.CLIENT)
-	public boolean canVault(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canVault(EntityPlayer player);
 
 	public boolean isVaulting();
 
@@ -20,10 +19,9 @@ public interface IVault {
 
 	public int getVaultAnimateTime();//Don't "return 0;"
 
-	public static IVault get(PlayerEntity entity) {
-		LazyOptional<IVault> optional = entity.getCapability(Capabilities.VAULT_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static IVault get(EntityPlayer entity) {
+		IVault vault = entity.getCapability(Capabilities.VAULT_CAPABILITY, null);
+		return vault;
 	}
 
 }

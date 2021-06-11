@@ -2,78 +2,72 @@ package com.alrex.parcool.common.network;
 
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.common.capability.ICatLeap;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
-public class SyncCatLeapMessage {
+public class SyncCatLeapMessage implements IMessage {
 	private boolean isLeaping = false;
 	private UUID playerID = null;
 
-	public void encode(PacketBuffer packet) {
+	public void toBytes(ByteBuf packet) {
 		packet.writeBoolean(this.isLeaping);
 		packet.writeLong(this.playerID.getMostSignificantBits());
 		packet.writeLong(this.playerID.getLeastSignificantBits());
 	}
 
-	public static SyncCatLeapMessage decode(PacketBuffer packet) {
-		SyncCatLeapMessage message = new SyncCatLeapMessage();
-		message.isLeaping = packet.readBoolean();
-		message.playerID = new UUID(packet.readLong(), packet.readLong());
-		return message;
+	public void fromBytes(ByteBuf packet) {
+		this.isLeaping = packet.readBoolean();
+		this.playerID = new UUID(packet.readLong(), packet.readLong());
 	}
 
-	@OnlyIn(Dist.DEDICATED_SERVER)
-	public void handleServer(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			PlayerEntity player;
-
-			player = contextSupplier.get().getSender();
-			ParCool.CHANNEL_INSTANCE.send(PacketDistributor.ALL.noArg(), this);
-			if (player == null) return;
+	@SideOnly(Side.SERVER)
+	public static SyncCatLeapMessage handleServer(SyncCatLeapMessage message, MessageContext context) {
+		EntityPlayerMP player = context.getServerHandler().player;
+		player.getServerWorld().func_152344_a(() -> {
+			ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
 			ICatLeap catLeap = ICatLeap.get(player);
 			if (catLeap == null) return;
 
-			catLeap.setLeaping(this.isLeaping);
+			catLeap.setLeaping(message.isLeaping);
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public void handleClient(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			PlayerEntity player;
-			if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
+	@SideOnly(Side.CLIENT)
+	public static SyncCatLeapMessage handleClient(SyncCatLeapMessage message, MessageContext context) {
+		Minecraft.getInstance().func_152344_a(() -> {
+			EntityPlayer player;
+			if (context.side == Side.CLIENT) {
 				World world = Minecraft.getInstance().world;
 				if (world == null) return;
-				player = world.getPlayerByUuid(playerID);
+				player = world.func_152378_a(message.playerID);
 				if (player == null || player.isUser()) return;
 			} else {
-				player = contextSupplier.get().getSender();
-				ParCool.CHANNEL_INSTANCE.send(PacketDistributor.ALL.noArg(), this);
+				player = context.getServerHandler().player;
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 				if (player == null) return;
 			}
 
 			ICatLeap catLeap = ICatLeap.get(player);
 			if (catLeap == null) return;
 
-			catLeap.setLeaping(this.isLeaping);
+			catLeap.setLeaping(message.isLeaping);
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public static void sync(PlayerEntity player) {
+	@SideOnly(Side.CLIENT)
+	public static void sync(EntityPlayer player) {
 		ICatLeap catLeap = ICatLeap.get(player);
 		if (catLeap == null) return;
 

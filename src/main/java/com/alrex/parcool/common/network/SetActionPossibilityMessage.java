@@ -3,72 +3,73 @@ package com.alrex.parcool.common.network;
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.ParCoolConfig;
 import com.alrex.parcool.constants.ActionsEnum;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.PacketDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
-import java.util.function.Supplier;
+import java.nio.charset.StandardCharsets;
 
-public class SetActionPossibilityMessage {
+public class SetActionPossibilityMessage implements IMessage, IMessageHandler<SetActionPossibilityMessage, SetActionPossibilityMessage> {
 	private ActionsEnum actionsEnum = null;
 	private boolean possibility = false;
 
-	public void encode(PacketBuffer packet) {
+	public void toBytes(ByteBuf packet) {
 		packet.writeBoolean(possibility);
-		packet.writeString(actionsEnum.name());
+		String name = actionsEnum.name();
+		packet.writeInt(name.length());
+		packet.writeCharSequence(name, StandardCharsets.US_ASCII);
 	}
 
-	public static SetActionPossibilityMessage decode(PacketBuffer packet) {
-		SetActionPossibilityMessage message = new SetActionPossibilityMessage();
-		message.possibility = packet.readBoolean();
-		message.actionsEnum = ActionsEnum.valueOf(packet.readString());
-		return message;
+	public void fromBytes(ByteBuf packet) {
+		this.possibility = packet.readBoolean();
+		this.actionsEnum = ActionsEnum.valueOf(packet.readCharSequence(packet.readInt(), StandardCharsets.US_ASCII).toString());
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			if (contextSupplier.get().getNetworkManager().getDirection() == PacketDirection.CLIENTBOUND) {
-				ParCoolConfig.Client c = ParCoolConfig.CONFIG_CLIENT;
+	public SetActionPossibilityMessage onMessage(SetActionPossibilityMessage message, MessageContext context) {
+		Minecraft.getInstance().func_152344_a(() -> {
+			if (context.side == Side.CLIENT) {
+				ParCoolConfig.Client c = ParCoolConfig.client;
 				switch (actionsEnum) {
 					case Crawl:
-						c.canCrawl.set(possibility);
+						c.canCrawl = (possibility);
 						break;
 					case CatLeap:
-						c.canCatLeap.set(possibility);
+						c.canCatLeap = (possibility);
 						break;
 					case Dodge:
-						c.canDodge.set(possibility);
+						c.canDodge = (possibility);
 						break;
 					case FastRunning:
-						c.canFastRunning.set(possibility);
+						c.canFastRunning = (possibility);
 						break;
 					case Roll:
-						c.canRoll.set(possibility);
+						c.canRoll = (possibility);
 						break;
 					case Vault:
-						c.canVault.set(possibility);
+						c.canVault = (possibility);
 						break;
 					case WallJump:
-						c.canWallJump.set(possibility);
+						c.canWallJump = (possibility);
 						break;
 					case GrabCliff:
-						c.canGrabCliff.set(possibility);
+						c.canGrabCliff = (possibility);
 						break;
 				}
-				ClientPlayerEntity player = Minecraft.getInstance().player;
+				EntityPlayerSP player = Minecraft.getInstance().player;
 			}
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	public static void send(ServerPlayerEntity player, ActionsEnum actionsEnum, boolean possibility) {
+	public static void send(EntityPlayerMP player, ActionsEnum actionsEnum, boolean possibility) {
 		SetActionPossibilityMessage message = new SetActionPossibilityMessage();
 		message.actionsEnum = actionsEnum;
 		message.possibility = possibility;
-		ParCool.CHANNEL_INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+		ParCool.CHANNEL_INSTANCE.sendTo(message, player);
 	}
 }

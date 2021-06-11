@@ -4,30 +4,31 @@ import com.alrex.parcool.ParCoolConfig;
 import com.alrex.parcool.client.input.KeyBindings;
 import com.alrex.parcool.common.capability.ICrawl;
 import com.alrex.parcool.common.capability.IRoll;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import com.alrex.parcool.utilities.PlayerUtils;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Roll implements IRoll {
 	private boolean rollReady = false;
 	private boolean rolling = false;
 	private int rollingTime = 0;
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canContinueRollReady(PlayerEntity player) {
+	public boolean canContinueRollReady(EntityPlayer player) {
 		ICrawl crawl = ICrawl.get(player);
 		if (crawl == null) return false;
 
-		return rollReady && ParCoolConfig.CONFIG_CLIENT.canRoll.get() && !crawl.isCrawling() && !crawl.isSliding() && KeyBindings.getKeyRoll().isKeyDown() && !rolling && !player.isInWaterOrBubbleColumn();
+		return rollReady && ParCoolConfig.client.canRoll && !crawl.isCrawling() && !crawl.isSliding() && KeyBindings.getKeyRoll().isKeyDown() && !rolling && !player.isInWater();
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canRollReady(PlayerEntity player) {
+	public boolean canRollReady(EntityPlayer player) {
 		ICrawl crawl = ICrawl.get(player);
 		if (crawl == null) return false;
-		return !player.collidedVertically && ParCoolConfig.CONFIG_CLIENT.canRoll.get() && player.getMotion().getY() < -0.25 && !crawl.isCrawling() && !crawl.isSliding() && KeyBindings.getKeyRoll().isKeyDown() && !player.isInWaterOrBubbleColumn();
+		return !player.collidedVertically && ParCoolConfig.client.canRoll && PlayerUtils.getVelocity(player).y < -0.25 && !crawl.isCrawling() && !crawl.isSliding() && KeyBindings.getKeyRoll().isKeyDown() && !player.isInWater();
 	}
 
 	@Override

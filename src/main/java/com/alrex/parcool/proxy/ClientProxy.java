@@ -3,97 +3,86 @@ package com.alrex.parcool.proxy;
 import com.alrex.parcool.client.gui.ParCoolGuideScreen;
 import com.alrex.parcool.common.network.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@OnlyIn(Dist.CLIENT)
+@SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
 	@Override
-	public void registerMessages(SimpleChannel instance) {
+	public void registerMessages(SimpleNetworkWrapper instance) {
 		instance.registerMessage(
-				0,
 				ResetFallDistanceMessage.class,
-				ResetFallDistanceMessage::encode,
-				ResetFallDistanceMessage::decode,
-				ResetFallDistanceMessage::handle
+				ResetFallDistanceMessage.class,
+				0,
+				Side.SERVER
 		);
 		instance.registerMessage(
-				1,
 				SetActionPossibilityMessage.class,
-				SetActionPossibilityMessage::encode,
-				SetActionPossibilityMessage::decode,
-				SetActionPossibilityMessage::handle
+				SetActionPossibilityMessage.class,
+				1,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				2,
 				ShowActionPossibilityMessage.class,
-				ShowActionPossibilityMessage::encode,
-				ShowActionPossibilityMessage::decode,
-				ShowActionPossibilityMessage::handle
+				ShowActionPossibilityMessage.class,
+				2,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				3,
+				StartRollMessage::handleClient,
 				StartRollMessage.class,
-				StartRollMessage::encode,
-				StartRollMessage::decode,
-				StartRollMessage::handleClient
+				3,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				4,
+				SyncCatLeapMessage::handleClient,
 				SyncCatLeapMessage.class,
-				SyncCatLeapMessage::encode,
-				SyncCatLeapMessage::decode,
-				SyncCatLeapMessage::handleClient
+				4,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				5,
+				SyncCrawlMessage::handleClient,
 				SyncCrawlMessage.class,
-				SyncCrawlMessage::encode,
-				SyncCrawlMessage::decode,
-				SyncCrawlMessage::handleClient
+				5,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				6,
+				SyncDodgeMessage::handleClient,
 				SyncDodgeMessage.class,
-				SyncDodgeMessage::encode,
-				SyncDodgeMessage::decode,
-				SyncDodgeMessage::handleClient
+				6,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				7,
+				SyncFastRunningMessage::handleClient,
 				SyncFastRunningMessage.class,
-				SyncFastRunningMessage::encode,
-				SyncFastRunningMessage::decode,
-				SyncFastRunningMessage::handleClient
+				7,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				8,
+				SyncGrabCliffMessage::handleClient,
 				SyncGrabCliffMessage.class,
-				SyncGrabCliffMessage::encode,
-				SyncGrabCliffMessage::decode,
-				SyncGrabCliffMessage::handleClient
+				8,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				9,
+				SyncRollReadyMessage::handleClient,
 				SyncRollReadyMessage.class,
-				SyncRollReadyMessage::encode,
-				SyncRollReadyMessage::decode,
-				SyncRollReadyMessage::handleClient
+				9,
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				10,
+				SyncStaminaMessage::handleClient,
 				SyncStaminaMessage.class,
-				SyncStaminaMessage::encode,
-				SyncStaminaMessage::decode,
-				SyncStaminaMessage::handleClient
+				10,
+				Side.CLIENT
 		);
 	}
 
 	@Override
-	public void showParCoolGuideScreen(PlayerEntity playerIn) {
-		if (playerIn.world.isRemote()) {
+	public void showParCoolGuideScreen(EntityPlayer playerIn) {
+		if (playerIn.world.isRemote) {
 			Minecraft.getInstance().displayGuiScreen(new ParCoolGuideScreen());
 		}
 	}

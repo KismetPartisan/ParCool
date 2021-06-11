@@ -2,81 +2,78 @@ package com.alrex.parcool.common.network;
 
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.common.capability.IDodge;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.function.Supplier;
 
-public class SyncDodgeMessage {
+public class SyncDodgeMessage implements IMessage {
 	private UUID playerID = null;
 	private boolean isDodging = false;
 	private String dodgeDirection = null;
 
-	public void encode(PacketBuffer packet) {
+	public void toBytes(ByteBuf packet) {
 		packet.writeBoolean(this.isDodging);
-		packet.writeString(dodgeDirection);
+		String name = dodgeDirection;
+		packet.writeInt(name.length());
+		packet.writeCharSequence(name, StandardCharsets.US_ASCII);
 		packet.writeLong(this.playerID.getMostSignificantBits());
 		packet.writeLong(this.playerID.getLeastSignificantBits());
 	}
 
-	public static SyncDodgeMessage decode(PacketBuffer packet) {
-		SyncDodgeMessage message = new SyncDodgeMessage();
-		message.isDodging = packet.readBoolean();
-		message.dodgeDirection = packet.readString(32767);
-		message.playerID = new UUID(packet.readLong(), packet.readLong());
-		return message;
+	public void fromBytes(ByteBuf packet) {
+		isDodging = packet.readBoolean();
+		dodgeDirection = packet.readCharSequence(packet.readInt(), StandardCharsets.US_ASCII).toString();
+		playerID = new UUID(packet.readLong(), packet.readLong());
 	}
 
-	@OnlyIn(Dist.DEDICATED_SERVER)
-	public void handleServer(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			PlayerEntity player;
-
-			player = contextSupplier.get().getSender();
-			ParCool.CHANNEL_INSTANCE.send(PacketDistributor.ALL.noArg(), this);
-			if (player == null) return;
+	@SideOnly(Side.SERVER)
+	public static SyncDodgeMessage handleServer(SyncDodgeMessage message, MessageContext context) {
+		EntityPlayerMP player = context.getServerHandler().player;
+		player.getServerWorld().func_152344_a(() -> {
+			ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
 			IDodge dodge = IDodge.get(player);
 			if (dodge == null) return;
-			dodge.setDirection(IDodge.DodgeDirection.valueOf(dodgeDirection));
-			dodge.setDodging(this.isDodging);
+			dodge.setDirection(IDodge.DodgeDirection.valueOf(message.dodgeDirection));
+			dodge.setDodging(message.isDodging);
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public void handleClient(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			PlayerEntity player;
-			if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
+	@SideOnly(Side.CLIENT)
+	public static SyncDodgeMessage handleClient(SyncDodgeMessage message, MessageContext context) {
+		Minecraft.getInstance().func_152344_a(() -> {
+			EntityPlayer player;
+			if (context.side == Side.CLIENT) {
 				World world = Minecraft.getInstance().world;
 				if (world == null) return;
-				player = world.getPlayerByUuid(playerID);
+				player = world.func_152378_a(message.playerID);
 				if (player == null || player.isUser()) return;
 			} else {
-				player = contextSupplier.get().getSender();
-				ParCool.CHANNEL_INSTANCE.send(PacketDistributor.ALL.noArg(), this);
+				player = context.getServerHandler().player;
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 				if (player == null) return;
 			}
 
 			IDodge dodge = IDodge.get(player);
 			if (dodge == null) return;
-			dodge.setDirection(IDodge.DodgeDirection.valueOf(dodgeDirection));
-			dodge.setDodging(this.isDodging);
+			dodge.setDirection(IDodge.DodgeDirection.valueOf(message.dodgeDirection));
+			dodge.setDodging(message.isDodging);
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public static void sync(PlayerEntity player) {
+	@SideOnly(Side.CLIENT)
+	public static void sync(EntityPlayer player) {
 		IDodge dodge = IDodge.get(player);
 		if (dodge == null) return;
 

@@ -1,43 +1,33 @@
 package com.alrex.parcool.client.renderer;
 
 import com.alrex.parcool.common.capability.IRoll;
-import com.alrex.parcool.utilities.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 
 public class PlayerRollRenderer {
 	public static void onRender(RenderPlayerEvent.Pre event) {
-		if (!(event.getPlayer() instanceof AbstractClientPlayerEntity)) return;
-		AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) event.getPlayer();
+		EntityPlayerSP player = (EntityPlayerSP) event.getEntityPlayer();
 		IRoll roll = IRoll.get(player);
 		if (roll == null) return;
 
 		if (roll.isRolling()) {
-			ClientPlayerEntity mainPlayer = Minecraft.getInstance().player;
+			/*
+			EntityPlayerSP mainPlayer = Minecraft.getInstance().player;
 			if (mainPlayer == null) return;
 
-			Vector3d lookVec = player.getLookVec().rotateYaw((float) Math.PI / 2);
-			Vector3f vec = new Vector3f((float) lookVec.getX(), 0, (float) lookVec.getZ());
+			Vec3d lookVec = player.getLookVec().rotateYaw((float) Math.PI / 2);
+			Vec3d vec = new Vec3d((float) lookVec.x, 0, (float) lookVec.z);
 
 			event.getMatrixStack().translate(0, player.getHeight() / 2, 0);
 			event.getMatrixStack().rotate(vec.rotationDegrees((roll.getRollingTime() + event.getPartialRenderTick()) * 40));
 			event.getMatrixStack().translate(0, -player.getHeight() / 2, 0);
 
-			PlayerRenderer renderer = event.getRenderer();
-			PlayerModel<AbstractClientPlayerEntity> model = renderer.getEntityModel();
+			RenderPlayer renderer = event.getRenderer();
+			ModelPlayer model = renderer.getEntityModel();
 
 			event.getMatrixStack().push();
-			Vector3d posOffset = RenderUtil.getPlayerOffset(mainPlayer, player, event.getPartialRenderTick());
-			event.getMatrixStack().translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
+			Vec3d posOffset = RenderUtil.getPlayerOffset(mainPlayer, player, event.getPartialRenderTick());
+			event.getMatrixStack().translate(posOffset.x, posOffset.getY(), posOffset.z);
 
 			model.bipedRightArm.showModel = true;
 			RenderUtil.rotateRightArm(player, model.bipedRightArm,
@@ -149,6 +139,8 @@ public class PlayerRollRenderer {
 			model.bipedRightLeg.showModel = false;
 			model.bipedRightLegwear.showModel = false;
 			model.bipedRightLeg.showModel = true;
+
+			 */
 		}
 	}
 }

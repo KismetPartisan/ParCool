@@ -1,17 +1,16 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface ICrawl {
-	@OnlyIn(Dist.CLIENT)
-	public boolean canCrawl(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canCrawl(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canSliding(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canSliding(EntityPlayer player);
 
 	public boolean isCrawling();
 
@@ -22,11 +21,10 @@ public interface ICrawl {
 	public void setSliding(boolean sliding);
 
 	//only in Client
-	public void updateSlidingTime(PlayerEntity player);
+	public void updateSlidingTime(EntityPlayer player);
 
-	public static ICrawl get(PlayerEntity entity) {
-		LazyOptional<ICrawl> optional = entity.getCapability(Capabilities.CRAWL_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static ICrawl get(EntityPlayer entity) {
+		ICrawl crawl = entity.getCapability(Capabilities.CRAWL_CAPABILITY, null);
+		return crawl;
 	}
 }

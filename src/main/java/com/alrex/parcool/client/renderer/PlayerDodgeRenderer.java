@@ -1,31 +1,32 @@
 package com.alrex.parcool.client.renderer;
 
 import com.alrex.parcool.common.capability.IDodge;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import com.alrex.parcool.utilities.PlayerUtils;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import org.lwjgl.opengl.GL11;
 
 public class PlayerDodgeRenderer {
 	public static void onRender(RenderPlayerEvent.Pre event) {
-		PlayerEntity player = event.getPlayer();
+		EntityPlayer player = event.getEntityPlayer();
 		IDodge dodge = IDodge.get(player);
 		if (dodge == null) return;
 
 		if (dodge.isDodging() && dodge.getDirection() == IDodge.DodgeDirection.Back) {
-			Vector3d lookVec = player.getLookVec().rotateYaw((float) Math.PI / 2);
-			Vector3f vec = new Vector3f((float) lookVec.getX(), 0, (float) lookVec.getZ());
+			Vec3d lookVec = player.getLookVec().rotateYaw((float) Math.PI / 2);
+			Vec3d vec = new Vec3d((float) lookVec.x, 0, (float) lookVec.z);
 
-			event.getMatrixStack().translate(0, player.getHeight() / 2, 0);
-			event.getMatrixStack().rotate(vec.rotationDegrees((dodge.getDodgingTime() + event.getPartialRenderTick()) * -30));
-			event.getMatrixStack().translate(0, -player.getHeight() / 2, 0);
+			GL11.glTranslated(0, PlayerUtils.getHeight(player) / 2, 0);
+			GL11.glRotated((dodge.getDodgingTime() + event.getPartialRenderTick()) * -30, vec.x, 0, vec.z);
+			GL11.glTranslated(0, -PlayerUtils.getHeight(player) / 2, 0);
 		} else if (dodge.isDodging() && dodge.getDirection() == IDodge.DodgeDirection.Front) {
-			Vector3d lookVec = player.getLookVec().rotateYaw((float) Math.PI / 2);
-			Vector3f vec = new Vector3f((float) lookVec.getX(), 0, (float) lookVec.getZ());
+			Vec3d lookVec = player.getLookVec().rotateYaw((float) Math.PI / 2);
+			Vec3d vec = new Vec3d((float) lookVec.x, 0, (float) lookVec.z);
 
-			event.getMatrixStack().translate(0, player.getHeight() / 2, 0);
-			event.getMatrixStack().rotate(vec.rotationDegrees((dodge.getDodgingTime() + event.getPartialRenderTick()) * 30));
-			event.getMatrixStack().translate(0, -player.getHeight() / 2, 0);
+			GL11.glTranslated(0, PlayerUtils.getHeight(player) / 2, 0);
+			GL11.glRotated((dodge.getDodgingTime() + event.getPartialRenderTick()) * 30, vec.x, 0, vec.z);
+			GL11.glTranslated(0, -PlayerUtils.getHeight(player) / 2, 0);
 		}
 	}
 }

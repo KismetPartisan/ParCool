@@ -1,20 +1,21 @@
 package com.alrex.parcool.common.capability.storage;
 
 import com.alrex.parcool.common.capability.IWallJump;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 
 public class WallJumpStorage implements Capability.IStorage<IWallJump> {
-	@Override
-	public void readNBT(Capability<IWallJump> capability, IWallJump instance, Direction side, INBT nbt) {
-	}
-
 	@Nullable
 	@Override
-	public INBT writeNBT(Capability<IWallJump> capability, IWallJump instance, Direction side) {
+	public NBTBase writeNBT(Capability<IWallJump> capability, IWallJump instance, EnumFacing side) {
 		return null;
+	}
+
+	@Override
+	public void readNBT(Capability<IWallJump> capability, IWallJump instance, EnumFacing side, NBTBase nbt) {
+
 	}
 }

@@ -1,13 +1,13 @@
 package com.alrex.parcool.client.input;
 
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-@OnlyIn(Dist.CLIENT)
+@SideOnly(Side.CLIENT)
 public class KeyRecorder {
 	public static final KeyState keyForward = new KeyState();
 	public static final KeyState keyBack = new KeyState();

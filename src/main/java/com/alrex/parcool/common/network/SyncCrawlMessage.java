@@ -2,83 +2,78 @@ package com.alrex.parcool.common.network;
 
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.common.capability.ICrawl;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
-public class SyncCrawlMessage {
+public class SyncCrawlMessage implements IMessage {
 
 	private boolean isCrawling = false;
 	private boolean isSliding = false;
 	private UUID playerID = null;
 
-	public void encode(PacketBuffer packet) {
+	public void toBytes(ByteBuf packet) {
 		packet.writeBoolean(this.isCrawling);
 		packet.writeBoolean(this.isSliding);
 		packet.writeLong(this.playerID.getMostSignificantBits());
 		packet.writeLong(this.playerID.getLeastSignificantBits());
 	}
 
-	public static SyncCrawlMessage decode(PacketBuffer packet) {
-		SyncCrawlMessage message = new SyncCrawlMessage();
-		message.isCrawling = packet.readBoolean();
-		message.isSliding = packet.readBoolean();
-		message.playerID = new UUID(packet.readLong(), packet.readLong());
-		return message;
+	public void fromBytes(ByteBuf packet) {
+		isCrawling = packet.readBoolean();
+		isSliding = packet.readBoolean();
+		playerID = new UUID(packet.readLong(), packet.readLong());
 	}
 
-	@OnlyIn(Dist.DEDICATED_SERVER)
-	public void handleServer(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			PlayerEntity player;
-			player = contextSupplier.get().getSender();
-			ParCool.CHANNEL_INSTANCE.send(PacketDistributor.ALL.noArg(), this);
-			if (player == null) return;
+	@SideOnly(Side.SERVER)
+	public static SyncCrawlMessage handleServer(SyncCrawlMessage message, MessageContext context) {
+		EntityPlayerMP player = context.getServerHandler().player;
+		player.getServerWorld().func_152344_a(() -> {
+			ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
 			ICrawl crawl = ICrawl.get(player);
 			if (crawl == null) return;
 
-			crawl.setCrawling(this.isCrawling);
-			crawl.setSliding(this.isSliding);
+			crawl.setCrawling(message.isCrawling);
+			crawl.setSliding(message.isSliding);
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public void handleClient(Supplier<NetworkEvent.Context> contextSupplier) {
-		contextSupplier.get().enqueueWork(() -> {
-			PlayerEntity player;
-			if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
+	@SideOnly(Side.CLIENT)
+	public static SyncCrawlMessage handleClient(SyncCrawlMessage message, MessageContext context) {
+		Minecraft.getInstance().func_152344_a(() -> {
+			EntityPlayer player;
+			if (context.side == Side.CLIENT) {
 				World world = Minecraft.getInstance().world;
 				if (world == null) return;
-				player = world.getPlayerByUuid(playerID);
+				player = world.func_152378_a(message.playerID);
 				if (player == null || player.isUser()) return;
 			} else {
-				player = contextSupplier.get().getSender();
-				ParCool.CHANNEL_INSTANCE.send(PacketDistributor.ALL.noArg(), this);
+				player = context.getServerHandler().player;
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 				if (player == null) return;
 			}
 
 			ICrawl crawl = ICrawl.get(player);
 			if (crawl == null) return;
 
-			crawl.setCrawling(this.isCrawling);
-			crawl.setSliding(this.isSliding);
+			crawl.setCrawling(message.isCrawling);
+			crawl.setSliding(message.isSliding);
 		});
-		contextSupplier.get().setPacketHandled(true);
+		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public static void sync(PlayerEntity player) {
+	@SideOnly(Side.CLIENT)
+	public static void sync(EntityPlayer player) {
 		ICrawl crawl = ICrawl.get(player);
 
 		SyncCrawlMessage message = new SyncCrawlMessage();

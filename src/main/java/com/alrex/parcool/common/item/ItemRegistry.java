@@ -3,7 +3,7 @@ package com.alrex.parcool.common.item;
 import com.alrex.parcool.common.item.items.ParCoolGuideItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ItemRegistry {
 	@SubscribeEvent

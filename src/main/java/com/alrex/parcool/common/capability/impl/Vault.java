@@ -4,10 +4,10 @@ import com.alrex.parcool.ParCoolConfig;
 import com.alrex.parcool.common.capability.IFastRunning;
 import com.alrex.parcool.common.capability.IVault;
 import com.alrex.parcool.utilities.WorldUtil;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Vault implements IVault {
 	private int vaultingTime = 0;
@@ -18,17 +18,17 @@ public class Vault implements IVault {
 		return 2;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean canVault(PlayerEntity player) {
+	public boolean canVault(EntityPlayer player) {
 		IFastRunning fastRunning = IFastRunning.get(player);
 		if (fastRunning == null) return false;
 
-		Vector3d lookVec = player.getLookVec();
-		lookVec = new Vector3d(lookVec.getX(), 0, lookVec.getZ()).normalize();
-		Vector3d wall = WorldUtil.getWall(player);
+		Vec3d lookVec = player.getLookVec();
+		lookVec = new Vec3d(lookVec.x, 0, lookVec.z).normalize();
+		Vec3d wall = WorldUtil.getWall(player);
 		if (wall == null) return false;
-		return !vaulting && ParCoolConfig.CONFIG_CLIENT.canVault.get() && fastRunning.isFastRunning() && fastRunning.getRunningTime() > 20 && player.collidedVertically && (wall.dotProduct(lookVec) / wall.length() / lookVec.length()) > 0.707106 /*check facing wall*/ && WorldUtil.getStep(player) != null && WorldUtil.getWallHeight(player) > 0.8;
+		return !vaulting && ParCoolConfig.client.canVault && fastRunning.isFastRunning() && fastRunning.getRunningTime() > 20 && player.collidedVertically && (wall.dotProduct(lookVec) / wall.length() / lookVec.length()) > 0.707106 /*check facing wall*/ && WorldUtil.getStep(player) != null && WorldUtil.getWallHeight(player) > 0.8;
 	}
 
 	@Override

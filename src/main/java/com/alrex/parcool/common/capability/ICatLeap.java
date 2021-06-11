@@ -1,22 +1,21 @@
 package com.alrex.parcool.common.capability;
 
 import com.alrex.parcool.common.capability.capabilities.Capabilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
 public interface ICatLeap {
-	@OnlyIn(Dist.CLIENT)
-	public boolean canCatLeap(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canCatLeap(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public boolean canReadyLeap(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public boolean canReadyLeap(EntityPlayer player);
 
-	@OnlyIn(Dist.CLIENT)
-	public double getBoostValue(PlayerEntity player);
+	@SideOnly(Side.CLIENT)
+	public double getBoostValue(EntityPlayer player);
 
 	public boolean isLeaping();
 
@@ -33,9 +32,8 @@ public interface ICatLeap {
 	public int getStaminaConsumption();
 
 	@Nullable
-	public static ICatLeap get(PlayerEntity entity) {
-		LazyOptional<ICatLeap> optional = entity.getCapability(Capabilities.CAT_LEAP_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+	public static ICatLeap get(EntityPlayer entity) {
+		ICatLeap catLeap = entity.getCapability(Capabilities.CAT_LEAP_CAPABILITY, null);
+		return catLeap;
 	}
 }

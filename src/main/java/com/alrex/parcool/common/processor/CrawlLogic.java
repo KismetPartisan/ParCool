@@ -3,29 +3,29 @@ package com.alrex.parcool.common.processor;
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.common.capability.ICrawl;
 import com.alrex.parcool.common.network.SyncCrawlMessage;
+import com.alrex.parcool.utilities.PlayerUtils;
 import com.alrex.parcool.utilities.VectorUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CrawlLogic {
-	private static Vector3d slidingVec = null;
+	private static Vec3d slidingVec = null;
 
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event) {
-		PlayerEntity player = event.player;
+		EntityPlayer player = event.player;
 
 		ICrawl crawl = ICrawl.get(player);
 		if (crawl == null) return;
 
 		if (crawl.isCrawling() || crawl.isSliding()) {
-			player.setPose(Pose.SWIMMING);
+			//player.setPose(Pose.SWIMMING);
 		}
 		if (crawl.isCrawling()) {
 			player.setSprinting(false);
@@ -43,23 +43,23 @@ public class CrawlLogic {
 			SyncCrawlMessage.sync(player);
 		}
 		if (!oldSliding && crawl.isSliding()) {
-			Vector3d vec = player.getMotion();
-			slidingVec = new Vector3d(vec.getX(), 0, vec.getZ()).scale(3.0);
+			Vec3d vec = PlayerUtils.getVelocity(player);
+			slidingVec = new Vec3d(vec.x, 0, vec.z).scale(3.0);
 		}
 		if (crawl.isSliding()) {
-			if (player.collidedVertically) player.setMotion(slidingVec);
+			if (player.collidedVertically) PlayerUtils.setVelocity(player, slidingVec);
 			slidingVec = slidingVec.scale(0.9);
 		}
 		if (crawl.isSliding()) {
-			player.rotationYaw = (float) (Math.atan2(slidingVec.getZ(), slidingVec.getX()) * 180.0 / Math.PI - 90.0);
+			player.rotationYaw = (float) (Math.atan2(slidingVec.z, slidingVec.x) * 180.0 / Math.PI - 90.0);
 		}
 	}
 
 
-	@OnlyIn(Dist.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onRender(TickEvent.RenderTickEvent event) {
-		ClientPlayerEntity player = Minecraft.getInstance().player;
+		EntityPlayerSP player = Minecraft.getInstance().player;
 		if (player == null || !ParCool.isActive()) return;
 
 		ICrawl crawl = ICrawl.get(player);

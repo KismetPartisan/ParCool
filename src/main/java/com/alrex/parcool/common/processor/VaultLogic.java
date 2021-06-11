@@ -2,24 +2,25 @@ package com.alrex.parcool.common.processor;
 
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.common.capability.IVault;
+import com.alrex.parcool.utilities.PlayerUtils;
 import com.alrex.parcool.utilities.WorldUtil;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class VaultLogic {
 	//only in Client
 	private static double wallHeight = 0;
 	//only in Client
-	private static Vector3d stepDirection = null;
+	private static Vec3d stepDirection = null;
 
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event) {
-		if (event.phase != TickEvent.Phase.START || event.side == LogicalSide.SERVER) return;
+		if (event.phase != TickEvent.Phase.START || event.side == Side.SERVER) return;
 
-		PlayerEntity player = event.player;
+		EntityPlayer player = event.player;
 		IVault vault = IVault.get(player);
 		if (vault == null) return;
 
@@ -35,12 +36,12 @@ public class VaultLogic {
 			wallHeight = WorldUtil.getWallHeight(event.player);
 		}
 		if (vault.isVaulting()) {
-			player.setMotion(stepDirection.getX() / 10, (wallHeight + 0.05) / vault.getVaultAnimateTime(), stepDirection.getZ() / 10);
+			PlayerUtils.setVelocity(player, new Vec3d(stepDirection.x / 10, (wallHeight + 0.05) / vault.getVaultAnimateTime(), stepDirection.z / 10));
 		}
 		if (vault.getVaultingTime() >= vault.getVaultAnimateTime()) {
 			vault.setVaulting(false);
 			stepDirection = stepDirection.normalize();
-			player.setMotion(stepDirection.getX() * 0.45, 0.15, stepDirection.getZ() * 0.45d);
+			PlayerUtils.setVelocity(player, new Vec3d(stepDirection.x * 0.45, 0.15, stepDirection.z * 0.45));
 		}
 	}
 }

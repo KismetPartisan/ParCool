@@ -25,8 +25,8 @@ public class ParCool {
 	public static final SimpleNetworkWrapper CHANNEL_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(
 			MOD_ID.concat(".message")
 	);
-	@SidedProxy(clientSide = "com.alrex.parcool.proxy.CleintProxy", serverSide = "com.alrex.parcool.proxy.ServerProxy")
-	public static final CommonProxy PROXY = null;
+	@SidedProxy(clientSide = "com.alrex.parcool.proxy.ClientProxy", serverSide = "com.alrex.parcool.proxy.ServerProxy")
+	public static CommonProxy PROXY = null;
 
 	public static final Logger LOGGER = LogManager.getLogger();
 

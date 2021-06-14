@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class ParCoolGuideScreen extends GuiScreen {
 			new GuiButton(8, 0, 0, 0, 0, "Vault"),
 			new GuiButton(9, 0, 0, 0, 0, "WallJump"),
 			new GuiButton(10, 0, 0, 0, 0, "Sliding"),
-			new GuiButton(11, 0, 0, 0, 0, "Settings")
+			new GuiButton(PAGE_SETTINGS, 0, 0, 0, 0, "Settings")
 	);
 
 	private final List<GuiCheckBox> settingButtons = Arrays.asList(
@@ -103,6 +104,11 @@ public class ParCoolGuideScreen extends GuiScreen {
 	//keyPressed?
 	@Override
 	public void func_73869_a(char p_73869_1_, int keyCode) {
+		try {
+			super.func_73869_a(p_73869_1_, keyCode);
+		} catch (IOException e) {
+			return;
+		}
 		syncSettings();
 		switch (keyCode) {
 			case Keyboard.KEY_UP:
@@ -125,7 +131,7 @@ public class ParCoolGuideScreen extends GuiScreen {
 					int height = button.field_146121_g;
 					int width = button.func_146117_b();
 					return (x < mouseX && mouseX < x + width && y < mouseY && mouseY < y + height);
-				}).findFirst().ifPresent(this::onPress);
+				}).findFirst().ifPresent(button -> button.func_146116_c(this.field_146297_k, mouseX, mouseY));
 			}
 			menuButtons.stream().filter(button -> {
 				int x = button.field_146128_h;

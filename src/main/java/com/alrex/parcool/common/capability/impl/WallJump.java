@@ -26,7 +26,7 @@ public class WallJump implements IWallJump {
 		IGrabCliff grabCliff = IGrabCliff.get(player);
 		if (stamina == null || grabCliff == null) return false;
 
-		return !stamina.isExhausted() && ParCoolConfig.client.canWallJump && !player.collidedVertically && !player.isInWater() && !player.isElytraFlying() && !player.abilities.isFlying && !grabCliff.isGrabbing() && KeyRecorder.keyJumpState.isPressed() && WorldUtil.getWall(player) != null;
+		return !stamina.isExhausted() && ParCoolConfig.client.canWallJump && !player.onGround && !player.isInWater() && !player.isElytraFlying() && !player.abilities.isFlying && !grabCliff.isGrabbing() && KeyRecorder.keyJumpState.isPressed() && WorldUtil.getWall(player) != null;
 	}
 
 	@SideOnly(Side.CLIENT)

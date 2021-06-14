@@ -26,19 +26,19 @@ public class WorldUtil {
 				entity.posZ + d
 		);
 
-		if (!entity.world.func_184143_b(baseBox.expand(distance, 0, 0))) {
+		if (entity.world.checkBlockCollision(baseBox.expand(distance, 0, 0))) {
 			wallX++;
 			wallNumX++;
 		}
-		if (!entity.world.func_184143_b(baseBox.expand(-distance, 0, 0))) {
+		if (entity.world.checkBlockCollision(baseBox.expand(-distance, 0, 0))) {
 			wallX--;
 			wallNumX++;
 		}
-		if (!entity.world.func_184143_b(baseBox.expand(0, 0, distance))) {
+		if (entity.world.checkBlockCollision(baseBox.expand(0, 0, distance))) {
 			wallZ++;
 			wallNumZ++;
 		}
-		if (!entity.world.func_184143_b(baseBox.expand(0, 0, -distance))) {
+		if (entity.world.checkBlockCollision(baseBox.expand(0, 0, -distance))) {
 			wallZ--;
 			wallNumZ++;
 		}
@@ -72,16 +72,16 @@ public class WorldUtil {
 				entity.posY + PlayerUtils.getHeight(entity),
 				entity.posZ + d
 		);
-		if (!world.func_184143_b(baseBoxSide.expand(distance, 0, 0)) && world.func_184143_b(baseBoxTop.expand(distance, 0, 0))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(distance, 0, 0)) && world.checkBlockCollision(baseBoxTop.expand(distance, 0, 0))) {
 			stepX++;
 		}
-		if (!world.func_184143_b(baseBoxSide.expand(-distance, 0, 0)) && world.func_184143_b(baseBoxTop.expand(-distance, 0, 0))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(-distance, 0, 0)) && world.checkBlockCollision(baseBoxTop.expand(-distance, 0, 0))) {
 			stepX--;
 		}
-		if (!world.func_184143_b(baseBoxSide.expand(0, 0, distance)) && world.func_184143_b(baseBoxTop.expand(0, 0, distance))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, distance)) && world.checkBlockCollision(baseBoxTop.expand(0, 0, distance))) {
 			stepZ++;
 		}
-		if (!world.func_184143_b(baseBoxSide.expand(0, 0, -distance)) && world.func_184143_b(baseBoxTop.expand(0, 0, -distance))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, -distance)) && world.checkBlockCollision(baseBoxTop.expand(0, 0, -distance))) {
 			stepZ--;
 		}
 		if (stepX == 0 && stepZ == 0) return null;
@@ -107,7 +107,7 @@ public class WorldUtil {
 					x1, y1 + v * i, z1, x2, y1 + v * (i + 1), z2
 			);
 
-			if (!world.func_184143_b(box)) {
+			if (!world.checkBlockCollision(box)) {
 				canReturn = true;
 			} else {
 				if (canReturn) return v * i;
@@ -139,13 +139,13 @@ public class WorldUtil {
 				entity.posZ + d
 		);
 
-		if (!world.func_184143_b(baseBoxSide.expand(distance, 0, 0)) && world.func_184143_b(baseBoxTop.expand(distance, 0, 0)))
+		if (world.checkBlockCollision(baseBoxSide.expand(distance, 0, 0)) && !world.checkBlockCollision(baseBoxTop.expand(distance, 0, 0)))
 			return true;
-		if (!world.func_184143_b(baseBoxSide.expand(-distance, 0, 0)) && world.func_184143_b(baseBoxTop.expand(-distance, 0, 0)))
+		if (world.checkBlockCollision(baseBoxSide.expand(-distance, 0, 0)) && !world.checkBlockCollision(baseBoxTop.expand(-distance, 0, 0)))
 			return true;
-		if (!world.func_184143_b(baseBoxSide.expand(0, 0, distance)) && world.func_184143_b(baseBoxTop.expand(0, 0, distance)))
+		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, distance)) && !world.checkBlockCollision(baseBoxTop.expand(0, 0, distance)))
 			return true;
-		if (!world.func_184143_b(baseBoxSide.expand(0, 0, -distance)) && world.func_184143_b(baseBoxTop.expand(0, 0, -distance)))
+		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, -distance)) && !world.checkBlockCollision(baseBoxTop.expand(0, 0, -distance)))
 			return true;
 
 		return false;

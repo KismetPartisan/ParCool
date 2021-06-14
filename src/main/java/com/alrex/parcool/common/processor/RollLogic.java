@@ -79,7 +79,7 @@ public class RollLogic {
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
-	public static void onRender(RenderPlayerEvent event) {
+	public static void onRender(RenderPlayerEvent.Pre event) {
 		if (event.getEntityPlayer() != Minecraft.getInstance().player) return;
 
 		if (rollDirection != null) event.getEntityPlayer().rotationYaw = (float) VectorUtil.toYawDegree(rollDirection);

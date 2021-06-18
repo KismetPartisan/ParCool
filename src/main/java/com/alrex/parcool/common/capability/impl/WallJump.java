@@ -2,6 +2,7 @@ package com.alrex.parcool.common.capability.impl;
 
 import com.alrex.parcool.ParCoolConfig;
 import com.alrex.parcool.client.input.KeyRecorder;
+import com.alrex.parcool.client.utils.StateRecorder;
 import com.alrex.parcool.common.capability.IGrabCliff;
 import com.alrex.parcool.common.capability.IStamina;
 import com.alrex.parcool.common.capability.IWallJump;
@@ -26,7 +27,7 @@ public class WallJump implements IWallJump {
 		IGrabCliff grabCliff = IGrabCliff.get(player);
 		if (stamina == null || grabCliff == null) return false;
 
-		return !stamina.isExhausted() && ParCoolConfig.client.canWallJump && !player.onGround && !player.isInWater() && !player.isElytraFlying() && !player.abilities.isFlying && !grabCliff.isGrabbing() && KeyRecorder.keyJumpState.isPressed() && WorldUtil.getWall(player) != null;
+		return !stamina.isExhausted() && ParCoolConfig.client.canWallJump && StateRecorder.INSTANCE.tickNotLanding > 4 && !player.onGround && !player.isInWater() && !player.isElytraFlying() && !player.abilities.isFlying && !grabCliff.isGrabbing() && KeyRecorder.keyJumpState.isPressed() && WorldUtil.getWall(player) != null;
 	}
 
 	@SideOnly(Side.CLIENT)

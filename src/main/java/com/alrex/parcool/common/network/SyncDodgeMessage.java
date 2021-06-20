@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -36,40 +37,46 @@ public class SyncDodgeMessage implements IMessage {
 	}
 
 	@SideOnly(Side.SERVER)
-	public static SyncDodgeMessage handleServer(SyncDodgeMessage message, MessageContext context) {
-		EntityPlayerMP player = context.getServerHandler().player;
-		player.getServerWorld().func_152344_a(() -> {
-			ParCool.CHANNEL_INSTANCE.sendToAll(message);
+	public static class ServerHandler implements IMessageHandler<SyncDodgeMessage, SyncDodgeMessage> {
+		@Override
+		public SyncDodgeMessage onMessage(SyncDodgeMessage message, MessageContext context) {
+			EntityPlayerMP player = context.getServerHandler().player;
+			player.getServerWorld().func_152344_a(() -> {
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
-			IDodge dodge = IDodge.get(player);
-			if (dodge == null) return;
-			dodge.setDirection(IDodge.DodgeDirection.valueOf(message.dodgeDirection));
-			dodge.setDodging(message.isDodging);
-		});
-		return null;
+				IDodge dodge = IDodge.get(player);
+				if (dodge == null) return;
+				dodge.setDirection(IDodge.DodgeDirection.valueOf(message.dodgeDirection));
+				dodge.setDodging(message.isDodging);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static SyncDodgeMessage handleClient(SyncDodgeMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			EntityPlayer player;
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				player = world.func_152378_a(message.playerID);
-				if (player == null || player.isUser()) return;
-			} else {
-				player = context.getServerHandler().player;
-				ParCool.CHANNEL_INSTANCE.sendToAll(message);
-				if (player == null) return;
-			}
+	public static class ClientHandler implements IMessageHandler<SyncDodgeMessage, SyncDodgeMessage> {
+		@Override
+		public SyncDodgeMessage onMessage(SyncDodgeMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				EntityPlayer player;
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					player = world.func_152378_a(message.playerID);
+					if (player == null || player.isUser()) return;
+				} else {
+					player = context.getServerHandler().player;
+					ParCool.CHANNEL_INSTANCE.sendToAll(message);
+					if (player == null) return;
+				}
 
-			IDodge dodge = IDodge.get(player);
-			if (dodge == null) return;
-			dodge.setDirection(IDodge.DodgeDirection.valueOf(message.dodgeDirection));
-			dodge.setDodging(message.isDodging);
-		});
-		return null;
+				IDodge dodge = IDodge.get(player);
+				if (dodge == null) return;
+				dodge.setDirection(IDodge.DodgeDirection.valueOf(message.dodgeDirection));
+				dodge.setDodging(message.isDodging);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

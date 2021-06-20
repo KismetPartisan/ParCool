@@ -18,8 +18,8 @@ public class ParCoolConfig {
 		public boolean canVault = true;
 		public boolean canWallJump = true;
 		@Config.RangeInt(min = 10, max = 5000)
-		public int maxStamina;
-		public boolean ParCoolActivation;
+		public int maxStamina = 1000;
+		public boolean ParCoolActivation = true;
 	}
 
 	public static void sync() {

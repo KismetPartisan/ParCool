@@ -28,52 +28,52 @@ public class ServerProxy extends CommonProxy {
 				Side.CLIENT
 		);
 		instance.registerMessage(
-				StartRollMessage::handleServer,
+				StartRollMessage.ServerHandler.class,
 				StartRollMessage.class,
 				3,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncCatLeapMessage::handleServer,
+				SyncCatLeapMessage.ServerHandler.class,
 				SyncCatLeapMessage.class,
 				4,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncCrawlMessage::handleServer,
+				SyncCrawlMessage.ServerHandler.class,
 				SyncCrawlMessage.class,
 				5,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncDodgeMessage::handleServer,
+				SyncDodgeMessage.ServerHandler.class,
 				SyncDodgeMessage.class,
 				6,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncFastRunningMessage::handleServer,
+				SyncFastRunningMessage.ServerHandler.class,
 				SyncFastRunningMessage.class,
 				7,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncGrabCliffMessage::handleServer,
+				SyncGrabCliffMessage.ServerHandler.class,
 				SyncGrabCliffMessage.class,
 				8,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncRollReadyMessage::handleServer,
+				SyncRollReadyMessage.ServerHandler.class,
 				SyncRollReadyMessage.class,
 				9,
-				Side.SERVER
+				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncStaminaMessage::handleServer,
+				SyncStaminaMessage.ServerHandler.class,
 				SyncStaminaMessage.class,
 				10,
-				Side.SERVER
+				Side.CLIENT
 		);
 	}
 }

@@ -31,52 +31,52 @@ public class ClientProxy extends CommonProxy {
 				Side.CLIENT
 		);
 		instance.registerMessage(
-				StartRollMessage::handleClient,
+				StartRollMessage.ClientHandler.class,
 				StartRollMessage.class,
 				3,
 				Side.CLIENT
 		);
 		instance.registerMessage(
-				SyncCatLeapMessage::handleClient,
+				SyncCatLeapMessage.ClientHandler.class,
 				SyncCatLeapMessage.class,
 				4,
-				Side.CLIENT
+				Side.SERVER
 		);
 		instance.registerMessage(
-				SyncCrawlMessage::handleClient,
+				SyncCrawlMessage.ClientHandler.class,
 				SyncCrawlMessage.class,
 				5,
-				Side.CLIENT
+				Side.SERVER
 		);
 		instance.registerMessage(
-				SyncDodgeMessage::handleClient,
+				SyncDodgeMessage.ClientHandler.class,
 				SyncDodgeMessage.class,
 				6,
-				Side.CLIENT
+				Side.SERVER
 		);
 		instance.registerMessage(
-				SyncFastRunningMessage::handleClient,
+				SyncFastRunningMessage.ClientHandler.class,
 				SyncFastRunningMessage.class,
 				7,
-				Side.CLIENT
+				Side.SERVER
 		);
 		instance.registerMessage(
-				SyncGrabCliffMessage::handleClient,
+				SyncGrabCliffMessage.ClientHandler.class,
 				SyncGrabCliffMessage.class,
 				8,
-				Side.CLIENT
+				Side.SERVER
 		);
 		instance.registerMessage(
-				SyncRollReadyMessage::handleClient,
+				SyncRollReadyMessage.ClientHandler.class,
 				SyncRollReadyMessage.class,
 				9,
-				Side.CLIENT
+				Side.SERVER
 		);
 		instance.registerMessage(
-				SyncStaminaMessage::handleClient,
+				SyncStaminaMessage.ClientHandler.class,
 				SyncStaminaMessage.class,
 				10,
-				Side.CLIENT
+				Side.SERVER
 		);
 	}
 

@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -29,35 +30,40 @@ public class StartRollMessage implements IMessage {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static StartRollMessage handleClient(StartRollMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				EntityPlayer startPlayer = world.func_152378_a(message.playerID);
-				if (startPlayer == null) return;
+	public static class ClientHandler implements IMessageHandler<StartRollMessage, StartRollMessage> {
+		@Override
+		public StartRollMessage onMessage(StartRollMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					EntityPlayer startPlayer = world.func_152378_a(message.playerID);
+					if (startPlayer == null) return;
 
-				IRoll roll = IRoll.get(startPlayer);
-				if (roll == null) return;
+					IRoll roll = IRoll.get(startPlayer);
+					if (roll == null) return;
 
-				if (!ParCoolConfig.client.canRoll || !ParCoolConfig.client.ParCoolActivation)
-					return;
-				if (startPlayer.isUser()) {
-					RollLogic.rollStart();
-				} else {
-					roll.setRollReady(false);
-					roll.setRolling(true);
+					if (!ParCoolConfig.client.canRoll || !ParCoolConfig.client.ParCoolActivation)
+						return;
+					if (startPlayer.isUser()) {
+						RollLogic.rollStart();
+					} else {
+						roll.setRollReady(false);
+						roll.setRolling(true);
+					}
 				}
-			}
-		});
-		return null;
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.SERVER)
-	public static StartRollMessage handleServer(StartRollMessage message, MessageContext context) {
-		return null;
+	public static class ServerHandler implements IMessageHandler<StartRollMessage, StartRollMessage> {
+		@Override
+		public StartRollMessage onMessage(StartRollMessage message, MessageContext ctx) {
+			return null;
+		}
 	}
-
 	public static void send(EntityPlayerMP player) {
 		StartRollMessage message = new StartRollMessage();
 		message.playerID = player.getUniqueID();

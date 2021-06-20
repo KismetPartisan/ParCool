@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -35,40 +36,46 @@ public class SyncStaminaMessage implements IMessage {
 		this.playerID = new UUID(packet.readLong(), packet.readLong());
 	}
 
-	@SideOnly(Side.SERVER)
-	public static SyncStaminaMessage handleServer(SyncStaminaMessage message, MessageContext context) {
-		EntityPlayerMP player = context.getServerHandler().player;
-		player.getServerWorld().func_152344_a(() -> {
-			ParCool.CHANNEL_INSTANCE.sendToAll(message);
-			IStamina stamina = IStamina.get(player);
-			if (stamina == null) return;
-
-			stamina.setStamina(message.stamina);
-			stamina.setExhausted(message.exhausted);
-		});
-		return null;
+	@SideOnly(Side.CLIENT)
+	public static class ClientHandler implements IMessageHandler<SyncStaminaMessage, SyncStaminaMessage> {
+		@Override
+		public SyncStaminaMessage onMessage(SyncStaminaMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				EntityPlayer player;
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					player = world.func_152378_a(message.playerID);
+					if (player == null || player.isUser()) return;
+				} else {
+					player = context.getServerHandler().player;
+					ParCool.CHANNEL_INSTANCE.sendToAll(message);
+					if (player == null) return;
+				}
+				IStamina stamina = IStamina.get(player);
+				if (stamina == null) return;
+				stamina.setStamina(message.stamina);
+				stamina.setExhausted(message.exhausted);
+			});
+			return null;
+		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public static SyncStaminaMessage handleClient(SyncStaminaMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			EntityPlayer player;
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				player = world.func_152378_a(message.playerID);
-				if (player == null || player.isUser()) return;
-			} else {
-				player = context.getServerHandler().player;
+	@SideOnly(Side.SERVER)
+	public static class ServerHandler implements IMessageHandler<SyncStaminaMessage, SyncStaminaMessage> {
+		@Override
+		public SyncStaminaMessage onMessage(SyncStaminaMessage message, MessageContext context) {
+			EntityPlayerMP player = context.getServerHandler().player;
+			player.getServerWorld().func_152344_a(() -> {
 				ParCool.CHANNEL_INSTANCE.sendToAll(message);
-				if (player == null) return;
-			}
-			IStamina stamina = IStamina.get(player);
-			if (stamina == null) return;
-			stamina.setStamina(message.stamina);
-			stamina.setExhausted(message.exhausted);
-		});
-		return null;
+				IStamina stamina = IStamina.get(player);
+				if (stamina == null) return;
+
+				stamina.setStamina(message.stamina);
+				stamina.setExhausted(message.exhausted);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

@@ -5,7 +5,9 @@ import com.alrex.parcool.client.input.KeyBindings;
 import com.alrex.parcool.common.capability.ICrawl;
 import com.alrex.parcool.common.capability.IFastRunning;
 import com.alrex.parcool.common.capability.IRoll;
+import com.alrex.parcool.utilities.PlayerUtils;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -41,6 +43,15 @@ public class Crawl implements ICrawl {
 	public boolean canCrawl(EntityPlayer player) {
 		IRoll roll = IRoll.get(player);
 		if (roll == null) return false;
+		if (isCrawling() || isSliding()) {
+			float d = PlayerUtils.getWidth(player) / 2;
+			AxisAlignedBB box =
+					new AxisAlignedBB(
+							player.posX - d, player.posY, player.posZ - d,
+							player.posX + d, player.posY + player.getDefaultEyeHeight(), player.posZ + d
+					);
+			if (player.world.checkBlockCollision(box)) return true;
+		}
 
 		return KeyBindings.getKeyCrawl().isKeyDown() && ParCoolConfig.client.canCrawl && !roll.isRolling() && !player.isInWater() && player.collidedVertically;
 	}

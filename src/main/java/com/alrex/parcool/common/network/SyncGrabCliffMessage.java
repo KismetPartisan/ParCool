@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,42 +31,48 @@ public class SyncGrabCliffMessage implements IMessage {
 	}
 
 	@SideOnly(Side.SERVER)
-	public static SyncGrabCliffMessage handleServer(SyncGrabCliffMessage message, MessageContext context) {
-		EntityPlayerMP player = context.getServerHandler().player;
+	public static class ServerHandler implements IMessageHandler<SyncGrabCliffMessage, SyncGrabCliffMessage> {
+		@Override
+		public SyncGrabCliffMessage onMessage(SyncGrabCliffMessage message, MessageContext context) {
+			EntityPlayerMP player = context.getServerHandler().player;
 
-		player.getServerWorld().func_152344_a(() -> {
-			ParCool.CHANNEL_INSTANCE.sendToAll(message);
+			player.getServerWorld().func_152344_a(() -> {
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
-			IGrabCliff grabCliff = IGrabCliff.get(player);
-			if (grabCliff == null) return;
+				IGrabCliff grabCliff = IGrabCliff.get(player);
+				if (grabCliff == null) return;
 
-			grabCliff.setGrabbing(message.isGrabbing);
-		});
-		return null;
+				grabCliff.setGrabbing(message.isGrabbing);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static SyncGrabCliffMessage handleClient(SyncGrabCliffMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			EntityPlayer player;
+	public static class ClientHandler implements IMessageHandler<SyncGrabCliffMessage, SyncGrabCliffMessage> {
+		@Override
+		public SyncGrabCliffMessage onMessage(SyncGrabCliffMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				EntityPlayer player;
 
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				player = world.func_152378_a(message.playerID);
-				if (player == null || player.isUser()) return;
-			} else {
-				player = context.getServerHandler().player;
-				ParCool.CHANNEL_INSTANCE.sendToAll(message);
-				if (player == null) return;
-			}
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					player = world.func_152378_a(message.playerID);
+					if (player == null || player.isUser()) return;
+				} else {
+					player = context.getServerHandler().player;
+					ParCool.CHANNEL_INSTANCE.sendToAll(message);
+					if (player == null) return;
+				}
 
-			IGrabCliff grabCliff = IGrabCliff.get(player);
-			if (grabCliff == null) return;
+				IGrabCliff grabCliff = IGrabCliff.get(player);
+				if (grabCliff == null) return;
 
-			grabCliff.setGrabbing(message.isGrabbing);
-		});
-		return null;
+				grabCliff.setGrabbing(message.isGrabbing);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

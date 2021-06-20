@@ -16,6 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CrawlLogic {
 	private static Vec3d slidingVec = null;
+	private static boolean isCrawlEyeHeight = false;
 
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event) {
@@ -25,13 +26,18 @@ public class CrawlLogic {
 		if (crawl == null) return;
 
 		if (crawl.isCrawling() || crawl.isSliding()) {
-			//player.setPose(Pose.SWIMMING);
-		}
-		if (crawl.isCrawling()) {
 			player.setSprinting(false);
+			PlayerUtils.setCrawlSize(player);
+			Vec3d vec = PlayerUtils.getVelocity(player);
+			PlayerUtils.setVelocity(player, new Vec3d(vec.x / 2, vec.y, vec.z / 2));
+			player.eyeHeight = player.getDefaultEyeHeight() / 2;
+			isCrawlEyeHeight = true;
+		} else if (isCrawlEyeHeight) {
+			isCrawlEyeHeight = false;
+			player.eyeHeight = player.getDefaultEyeHeight();
 		}
 		if (!ParCool.isActive()) return;
-		if (!player.isUser() || event.phase != TickEvent.Phase.START) return;
+		if (!player.isUser() || event.phase != TickEvent.Phase.START || event.side == Side.SERVER) return;
 
 		boolean oldCrawling = crawl.isCrawling();
 		crawl.setCrawling(crawl.canCrawl(player));

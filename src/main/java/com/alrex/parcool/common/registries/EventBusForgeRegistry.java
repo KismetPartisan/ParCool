@@ -19,7 +19,7 @@ public class EventBusForgeRegistry {
 		bus.register(FastRunningLogic.class);
 		bus.register(GrabCliffLogic.class);
 		bus.register(JumpBoostLogic.class);
-		//bus.register(RollLogic.class);
+		bus.register(RollLogic.class);
 		bus.register(StaminaLogic.class);
 		bus.register(VaultLogic.class);
 		bus.register(WallJumpLogic.class);

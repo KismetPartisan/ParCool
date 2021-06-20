@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,38 +31,44 @@ public class SyncFastRunningMessage implements IMessage {
 	}
 
 	@SideOnly(Side.SERVER)
-	public static SyncFastRunningMessage handleServer(SyncFastRunningMessage message, MessageContext context) {
-		EntityPlayerMP player = context.getServerHandler().player;
-		player.getServerWorld().func_152344_a(() -> {
-			ParCool.CHANNEL_INSTANCE.sendToAll(message);
+	public static class ServerHandler implements IMessageHandler<SyncFastRunningMessage, SyncFastRunningMessage> {
+		@Override
+		public SyncFastRunningMessage onMessage(SyncFastRunningMessage message, MessageContext context) {
+			EntityPlayerMP player = context.getServerHandler().player;
+			player.getServerWorld().func_152344_a(() -> {
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
-			IFastRunning fastRunning = IFastRunning.get(player);
-			if (fastRunning == null) return;
-			fastRunning.setFastRunning(message.isFastRunning);
-		});
-		return null;
+				IFastRunning fastRunning = IFastRunning.get(player);
+				if (fastRunning == null) return;
+				fastRunning.setFastRunning(message.isFastRunning);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static SyncFastRunningMessage handleClient(SyncFastRunningMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			EntityPlayer player;
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				player = world.func_152378_a(message.playerID);
-				if (player == null || player.isUser()) return;
-			} else {
-				player = context.getServerHandler().player;
-				ParCool.CHANNEL_INSTANCE.sendToAll(message);
-				if (player == null) return;
-			}
+	public static class ClientHandler implements IMessageHandler<SyncFastRunningMessage, SyncFastRunningMessage> {
+		@Override
+		public SyncFastRunningMessage onMessage(SyncFastRunningMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				EntityPlayer player;
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					player = world.func_152378_a(message.playerID);
+					if (player == null || player.isUser()) return;
+				} else {
+					player = context.getServerHandler().player;
+					ParCool.CHANNEL_INSTANCE.sendToAll(message);
+					if (player == null) return;
+				}
 
-			IFastRunning fastRunning = IFastRunning.get(player);
-			if (fastRunning == null) return;
-			fastRunning.setFastRunning(message.isFastRunning);
-		});
-		return null;
+				IFastRunning fastRunning = IFastRunning.get(player);
+				if (fastRunning == null) return;
+				fastRunning.setFastRunning(message.isFastRunning);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

@@ -72,16 +72,16 @@ public class WorldUtil {
 				entity.posY + PlayerUtils.getHeight(entity),
 				entity.posZ + d
 		);
-		if (world.checkBlockCollision(baseBoxSide.expand(distance, 0, 0)) && world.checkBlockCollision(baseBoxTop.expand(distance, 0, 0))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(distance, 0, 0)) && !world.checkBlockCollision(baseBoxTop.expand(distance, 0, 0))) {
 			stepX++;
 		}
-		if (world.checkBlockCollision(baseBoxSide.expand(-distance, 0, 0)) && world.checkBlockCollision(baseBoxTop.expand(-distance, 0, 0))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(-distance, 0, 0)) && !world.checkBlockCollision(baseBoxTop.expand(-distance, 0, 0))) {
 			stepX--;
 		}
-		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, distance)) && world.checkBlockCollision(baseBoxTop.expand(0, 0, distance))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, distance)) && !world.checkBlockCollision(baseBoxTop.expand(0, 0, distance))) {
 			stepZ++;
 		}
-		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, -distance)) && world.checkBlockCollision(baseBoxTop.expand(0, 0, -distance))) {
+		if (world.checkBlockCollision(baseBoxSide.expand(0, 0, -distance)) && !world.checkBlockCollision(baseBoxTop.expand(0, 0, -distance))) {
 			stepZ--;
 		}
 		if (stepX == 0 && stepZ == 0) return null;

@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,42 +35,48 @@ public class SyncCrawlMessage implements IMessage {
 	}
 
 	@SideOnly(Side.SERVER)
-	public static SyncCrawlMessage handleServer(SyncCrawlMessage message, MessageContext context) {
-		EntityPlayerMP player = context.getServerHandler().player;
-		player.getServerWorld().func_152344_a(() -> {
-			ParCool.CHANNEL_INSTANCE.sendToAll(message);
+	public static class ServerHandler implements IMessageHandler<SyncCrawlMessage, SyncCrawlMessage> {
+		@Override
+		public SyncCrawlMessage onMessage(SyncCrawlMessage message, MessageContext context) {
+			EntityPlayerMP player = context.getServerHandler().player;
+			player.getServerWorld().func_152344_a(() -> {
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
-			ICrawl crawl = ICrawl.get(player);
-			if (crawl == null) return;
+				ICrawl crawl = ICrawl.get(player);
+				if (crawl == null) return;
 
-			crawl.setCrawling(message.isCrawling);
-			crawl.setSliding(message.isSliding);
-		});
-		return null;
+				crawl.setCrawling(message.isCrawling);
+				crawl.setSliding(message.isSliding);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static SyncCrawlMessage handleClient(SyncCrawlMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			EntityPlayer player;
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				player = world.func_152378_a(message.playerID);
-				if (player == null || player.isUser()) return;
-			} else {
-				player = context.getServerHandler().player;
-				ParCool.CHANNEL_INSTANCE.sendToAll(message);
-				if (player == null) return;
-			}
+	public static class ClientHandler implements IMessageHandler<SyncCrawlMessage, SyncCrawlMessage> {
+		@Override
+		public SyncCrawlMessage onMessage(SyncCrawlMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				EntityPlayer player;
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					player = world.func_152378_a(message.playerID);
+					if (player == null || player.isUser()) return;
+				} else {
+					player = context.getServerHandler().player;
+					ParCool.CHANNEL_INSTANCE.sendToAll(message);
+					if (player == null) return;
+				}
 
-			ICrawl crawl = ICrawl.get(player);
-			if (crawl == null) return;
+				ICrawl crawl = ICrawl.get(player);
+				if (crawl == null) return;
 
-			crawl.setCrawling(message.isCrawling);
-			crawl.setSliding(message.isSliding);
-		});
-		return null;
+				crawl.setCrawling(message.isCrawling);
+				crawl.setSliding(message.isSliding);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

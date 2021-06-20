@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,40 +31,46 @@ public class SyncCatLeapMessage implements IMessage {
 	}
 
 	@SideOnly(Side.SERVER)
-	public static SyncCatLeapMessage handleServer(SyncCatLeapMessage message, MessageContext context) {
-		EntityPlayerMP player = context.getServerHandler().player;
-		player.getServerWorld().func_152344_a(() -> {
-			ParCool.CHANNEL_INSTANCE.sendToAll(message);
+	public static class ServerHandler implements IMessageHandler<SyncCatLeapMessage, SyncCatLeapMessage> {
+		@Override
+		public SyncCatLeapMessage onMessage(SyncCatLeapMessage message, MessageContext context) {
+			EntityPlayerMP player = context.getServerHandler().player;
+			player.getServerWorld().func_152344_a(() -> {
+				ParCool.CHANNEL_INSTANCE.sendToAll(message);
 
-			ICatLeap catLeap = ICatLeap.get(player);
-			if (catLeap == null) return;
+				ICatLeap catLeap = ICatLeap.get(player);
+				if (catLeap == null) return;
 
-			catLeap.setLeaping(message.isLeaping);
-		});
-		return null;
+				catLeap.setLeaping(message.isLeaping);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static SyncCatLeapMessage handleClient(SyncCatLeapMessage message, MessageContext context) {
-		Minecraft.getInstance().func_152344_a(() -> {
-			EntityPlayer player;
-			if (context.side == Side.CLIENT) {
-				World world = Minecraft.getInstance().world;
-				if (world == null) return;
-				player = world.func_152378_a(message.playerID);
-				if (player == null || player.isUser()) return;
-			} else {
-				player = context.getServerHandler().player;
-				ParCool.CHANNEL_INSTANCE.sendToAll(message);
-				if (player == null) return;
-			}
+	public static class ClientHandler implements IMessageHandler<SyncCatLeapMessage, SyncCatLeapMessage> {
+		@Override
+		public SyncCatLeapMessage onMessage(SyncCatLeapMessage message, MessageContext context) {
+			Minecraft.getInstance().func_152344_a(() -> {
+				EntityPlayer player;
+				if (context.side == Side.CLIENT) {
+					World world = Minecraft.getInstance().world;
+					if (world == null) return;
+					player = world.func_152378_a(message.playerID);
+					if (player == null || player.isUser()) return;
+				} else {
+					player = context.getServerHandler().player;
+					ParCool.CHANNEL_INSTANCE.sendToAll(message);
+					if (player == null) return;
+				}
 
-			ICatLeap catLeap = ICatLeap.get(player);
-			if (catLeap == null) return;
+				ICatLeap catLeap = ICatLeap.get(player);
+				if (catLeap == null) return;
 
-			catLeap.setLeaping(message.isLeaping);
-		});
-		return null;
+				catLeap.setLeaping(message.isLeaping);
+			});
+			return null;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

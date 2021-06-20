@@ -36,6 +36,7 @@ public class FastRunningLogic {
 		if (fastRunning.isFastRunning()) player.setSprinting(true);
 
 		if (event.phase != TickEvent.Phase.START) return;
+		fastRunning.updateTime();
 		if (!player.isUser() || !ParCoolConfig.client.ParCoolActivation) return;
 
 		IAttributeInstance attr = player.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
@@ -47,8 +48,6 @@ public class FastRunningLogic {
 
 		boolean oldFastRunning = fastRunning.isFastRunning();
 		fastRunning.setFastRunning(fastRunning.canFastRunning(player));
-
-		fastRunning.updateTime();
 
 		if (fastRunning.isFastRunning() != oldFastRunning) SyncFastRunningMessage.sync(player);
 

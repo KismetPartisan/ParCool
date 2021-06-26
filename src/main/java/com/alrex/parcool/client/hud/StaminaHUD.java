@@ -45,7 +45,7 @@ public class StaminaHUD extends Gui {
 	}
 
 	private static void renderYellowHeart(int x, int y, int width, int height) {
-		GuiUtils.drawTexturedModalRect(x, y, 0, 256, width, height, 0);
+		Gui.func_152125_a(x, y, 161, 1, 7, 7, width, height, 256, 256);
 	}
 
 	private static int getStaminaColor(double factor, boolean exhausted) {

@@ -2,7 +2,7 @@
   {
     "modid": "parcool",
     "name": "ParCool!",
-    "description": "This enable us act like parkour players.\n    Enjoy Minecraft with cool actions!\n    If you need more information, use \"/parcool giveTutorialBook\"",
+    "description": "This enable us act like parkour players.\n    Enjoy Minecraft with cool actions!\n    If you need more information, use ParCool Guide in game.",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "https://www.curseforge.com/minecraft/mc-mods/parcool",

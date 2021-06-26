@@ -8,11 +8,21 @@ public class ParCoolItemGroup extends CreativeTabs {
 	public static final ParCoolItemGroup INSTANCE = new ParCoolItemGroup();
 
 	public ParCoolItemGroup() {
-		super("ParCool");
+		super("parcool");
 	}
 
 	@Override
 	public ItemStack createIcon() {
 		return new ItemStack(ParCoolGuideItem.INSTANCE);
+	}
+
+	@Override
+	public ItemStack getIcon() {
+		return new ItemStack(ParCoolGuideItem.INSTANCE);
+	}
+
+	@Override
+	public String getTranslationKey() {
+		return "itemGroup.parcool";
 	}
 }

@@ -91,12 +91,12 @@ public class ParCoolGuideScreen extends GuiScreen {
 		Minecraft mc = this.field_146297_k;
 		mc.getTextureManager().bindTexture(BACKGROUND_LOCATION);
 		ScaledResolution resolution = new ScaledResolution(mc);
-		int width = 250;
+		int width = 256;
 		int height = (int) (width * 0.75);
 		int offsetX = (resolution.func_78326_a() - width) / 2;
 		int offsetY = (resolution.func_78328_b() - height) / 2;
 
-		GuiUtils.drawTexturedModalRect(offsetX, offsetY, 256, 192, width, height, 0);
+		GuiUtils.drawContinuousTexturedBox(offsetX, offsetY, 0, 0, width, height, 256, 192, 0, 0);
 		renderContent(offsetX, offsetY, width / 2, height, mouseX, mouseY, partialTick);
 		renderMenu(offsetX + width / 2, offsetY, width / 2, height, mouseX, mouseY, partialTick);
 	}
@@ -228,7 +228,7 @@ public class ParCoolGuideScreen extends GuiScreen {
 	}
 
 	private static List<String> getPages() {
-		final String path = "/assets/parcool/book/parcool_guide_content.txt";
+		final String path = "/assets/parcool/book/parcoolGuide_content.txt";
 		BufferedReader reader = new BufferedReader(new InputStreamReader(ParCool.class.getResourceAsStream(path), StandardCharsets.UTF_8));
 		ArrayList<String> texts = new ArrayList<>();
 		//=======

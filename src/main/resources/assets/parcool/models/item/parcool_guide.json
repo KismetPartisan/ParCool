@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "item/generated",
   "textures": {
-    "layer0": "parcool:item/parcool_guide"
+    "layer0": "parcool:items/parcool_guide"
   }
 }

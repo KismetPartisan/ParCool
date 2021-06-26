@@ -24,6 +24,11 @@ public class ParCoolGuideItem extends Item {
 		setRegistryName(RESOURCE_LOCATION);
 	}
 
+	@Override
+	public String func_77653_i(ItemStack p_77653_1_) {
+		return "ParCool Guide";
+	}
+
 	@Nullable
 	@Override
 	public CreativeTabs getGroup() {
@@ -35,5 +40,4 @@ public class ParCoolGuideItem extends Item {
 		ParCool.PROXY.showParCoolGuideScreen(playerIn);
 		return ActionResult.newResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 	}
-
 }

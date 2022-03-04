@@ -8,14 +8,15 @@ import com.alrex.parcool.common.info.ActionPermission;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
 public class Parkourability {
+	@Nullable
 	public static Parkourability get(PlayerEntity player) {
 		LazyOptional<Parkourability> optional = player.getCapability(Capabilities.PARKOURABILITY_CAPABILITY);
-		if (!optional.isPresent()) return null;
-		return optional.orElseThrow(IllegalStateException::new);
+		return optional.orElse(null);
 	}
 
 	private final CatLeap catLeap = new CatLeap();

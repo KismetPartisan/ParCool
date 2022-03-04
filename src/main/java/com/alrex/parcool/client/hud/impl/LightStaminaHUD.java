@@ -8,7 +8,6 @@ import com.alrex.parcool.common.capability.Stamina;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tags.FluidTags;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
@@ -23,25 +22,23 @@ public class LightStaminaHUD extends AbstractHUD {
 	@Override
 	public void render(RenderGameOverlayEvent.Pre event, MatrixStack stack) {
 		if (event.getType() != RenderGameOverlayEvent.ElementType.EXPERIENCE) return;
-		if (
-				!ParCoolConfig.CONFIG_CLIENT.ParCoolActivation.get()
-						|| !ParCoolConfig.CONFIG_CLIENT.useLightHUD.get()
-		) return;
 		ClientPlayerEntity player = Minecraft.getInstance().player;
 		if (player == null || player.areEyesInFluid(FluidTags.WATER)) return;
 		if (player.isCreative()) return;
+
 		Stamina stamina = Stamina.get(player);
 		Parkourability parkourability = Parkourability.get(player);
 		if (stamina == null || parkourability == null) return;
-		if (ParCoolConfig.CONFIG_CLIENT.hideStaminaHUD.get()
-				&& ParCoolConfig.CONFIG_CLIENT.infiniteStamina.get()
-				&& parkourability.getActionInfo().isStaminaInfinite()
-		) return;
+
+		if (ParCoolConfig.CONFIG_CLIENT.infiniteStamina.get() && parkourability.getActionInfo().isStaminaInfinite())
+			return;
+
 		if (stamina.getStamina() == 0) return;
 		long gameTime = player.getEntityWorld().getGameTime();
 		if (stamina.getStamina() != oldValue) {
 			lastChangedTick = gameTime;
 		} else if (gameTime - lastChangedTick > 40) return;
+
 		oldValue = stamina.getStamina();
 		float staminaScale = (float) stamina.getStamina() / stamina.getMaxStamina();
 		if (staminaScale < 0) staminaScale = 0;
@@ -55,7 +52,7 @@ public class LightStaminaHUD extends AbstractHUD {
 
 		mc.getTextureManager().bindTexture(StaminaHUD.STAMINA);
 		int baseX = scaledWidth / 2 + 92;
-		int y = scaledHeight - 49;
+		int y = scaledHeight - 49 + ParCoolConfig.CONFIG_CLIENT.offsetVerticalLightStaminaHUD.get();
 		for (int i = 1; i <= 10; i++) {
 			int x = baseX - i * 8 - 1;
 			int textureX;
@@ -69,9 +66,5 @@ public class LightStaminaHUD extends AbstractHUD {
 			}
 			AbstractHUD.func_238463_a_(stack, x, y, textureX, 119f, 8, 9, 128, 128);
 		}
-	}
-
-	private PlayerEntity getRenderViewPlayer() {
-		return !(Minecraft.getInstance().getRenderViewEntity() instanceof PlayerEntity) ? null : (PlayerEntity) Minecraft.getInstance().getRenderViewEntity();
 	}
 }

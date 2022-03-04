@@ -3,6 +3,7 @@ package com.alrex.parcool.client.input;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,11 +15,11 @@ import org.lwjgl.glfw.GLFW;
 public class KeyBindings {
 	private static final GameSettings settings = Minecraft.getInstance().gameSettings;
 	private static final KeyBinding keyBindCrawl = new KeyBinding("key.crawl.description", GLFW.GLFW_KEY_C, "key.categories.movement");
-	private static final KeyBinding keyBindGrabWall = new KeyBinding("key.grab.description", GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.movement");
+	private static final KeyBinding keyBindGrabWall = new KeyBinding("key.grab.description", InputMappings.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.movement");
 	private static final KeyBinding keyBindRoll = new KeyBinding("key.roll.description", GLFW.GLFW_KEY_C, "key.categories.movement");
 	private static final KeyBinding keyBindFastRunning = new KeyBinding("key.fastrunning.description", GLFW.GLFW_KEY_LEFT_CONTROL, "key.categories.movement");
-	private static final KeyBinding keyBindDodge = new KeyBinding("key.dodge.description", GLFW.GLFW_KEY_DELETE, "key.categories.movement");
-	private static final KeyBinding keyBindActivateParCool = new KeyBinding("key.parcool.activate", GLFW.GLFW_KEY_P, "key.categories.parcool");
+	private static final KeyBinding keyBindDodge = new KeyBinding("key.dodge.description", GLFW.GLFW_KEY_R, "key.categories.movement");
+	private static final KeyBinding keyBindOpenSettings = new KeyBinding("key.parcool.setting.open", GLFW.GLFW_KEY_P, "key.categories.parcool");
 
 	public static KeyBinding getKeySprint() {
 		return settings.keyBindSprint;
@@ -57,7 +58,7 @@ public class KeyBindings {
 	}
 
 	public static KeyBinding getKeyActivateParCool() {
-		return keyBindActivateParCool;
+		return keyBindOpenSettings;
 	}
 
 	public static KeyBinding getKeyRoll() {
@@ -79,6 +80,6 @@ public class KeyBindings {
 		ClientRegistry.registerKeyBinding(keyBindRoll);
 		ClientRegistry.registerKeyBinding(keyBindFastRunning);
 		ClientRegistry.registerKeyBinding(keyBindDodge);
-		ClientRegistry.registerKeyBinding(keyBindActivateParCool);
+		ClientRegistry.registerKeyBinding(keyBindOpenSettings);
 	}
 }

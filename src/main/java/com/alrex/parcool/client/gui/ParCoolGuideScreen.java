@@ -12,7 +12,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
@@ -24,6 +26,8 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.alrex.parcool.utilities.ColorUtil.getColorCodeFromARGB;
 
 @OnlyIn(Dist.CLIENT)
 public class ParCoolGuideScreen extends Screen {
@@ -204,17 +208,15 @@ public class ParCoolGuideScreen extends Screen {
 		menu.setY(top + menuOffsetY);
 		menu.setWidth(width - menuOffsetX * 2);
 		menu.setHeight(height - menuOffsetY * 2);
-		menu.render(stack, fontRenderer);
-	}
-
-	private static int getColorCodeFromARGB(int a, int r, int g, int b) {
-		return a * 0x1000000 + r * 0x10000 + g * 0x100 + b;
+		menu.render(stack, fontRenderer, mouseX, mouseY, n);
 	}
 
 	private void changePage(int i) {
 		if (i != PAGE_HOME && (i < 0 || book.getPages().size() <= i)) return;
 		scrollValue = 0;
 		currentPage = i;
+		PlayerEntity player = Minecraft.getInstance().player;
+		if (player != null) player.playSound(SoundEvents.ITEM_BOOK_PAGE_TURN, 1.0f, 1.0f);
 	}
 
 }

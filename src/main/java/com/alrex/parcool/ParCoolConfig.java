@@ -27,13 +27,14 @@ public class ParCoolConfig {
 		public final ForgeConfigSpec.BooleanValue disableCameraDodge;
 		public final ForgeConfigSpec.BooleanValue substituteSprintForFastRun;
 		public final ForgeConfigSpec.DoubleValue fastRunningModifier;
-		public final ForgeConfigSpec.BooleanValue ParCoolActivation;
+		public final ForgeConfigSpec.BooleanValue parCoolActivation;
 		public final ForgeConfigSpec.BooleanValue hideStaminaHUD;
 		public final ForgeConfigSpec.BooleanValue useLightHUD;
 		public final ForgeConfigSpec.EnumValue<Position.Horizontal> alignHorizontalStaminaHUD;
 		public final ForgeConfigSpec.EnumValue<Position.Vertical> alignVerticalStaminaHUD;
 		public final ForgeConfigSpec.IntValue marginHorizontalStaminaHUD;
 		public final ForgeConfigSpec.IntValue marginVerticalStaminaHUD;
+		public final ForgeConfigSpec.IntValue offsetVerticalLightStaminaHUD;
 
 		Client(ForgeConfigSpec.Builder builder) {
 			builder.comment("Enable ParCool Actions").push("Possibility of Actions");
@@ -62,6 +63,7 @@ public class ParCoolConfig {
 				alignVerticalStaminaHUD = builder.comment("vertical alignment").defineEnum("align_V_S_HUD", Position.Vertical.Bottom);
 				marginHorizontalStaminaHUD = builder.comment("horizontal margin").defineInRange("margin_H_S_HUD", 3, 0, 100);
 				marginVerticalStaminaHUD = builder.comment("vertical margin").defineInRange("margin_V_S_HUD", 3, 0, 100);
+				offsetVerticalLightStaminaHUD = builder.comment("vertical offset of light stamina HUD").defineInRange("offset_V_LS_HUD", 0, -50, 50);
 			}
 			builder.pop();
 			builder.comment("Others").push("Other configuration");
@@ -78,7 +80,7 @@ public class ParCoolConfig {
 			builder.pop();
 			builder.comment("About ParCool").push("ParCool");
 			{
-				ParCoolActivation = builder.comment("ParCool is Active").define("ParCool_Activation", true);
+				parCoolActivation = builder.comment("ParCool is Active").define("ParCool_Activation", true);
 			}
 			builder.pop();
 		}
@@ -90,7 +92,7 @@ public class ParCoolConfig {
 		public final ForgeConfigSpec.BooleanValue allowCrawl;
 		public final ForgeConfigSpec.BooleanValue allowDodge;
 		public final ForgeConfigSpec.BooleanValue allowFastRunning;
-		public final ForgeConfigSpec.BooleanValue allowGrabCliff;
+		public final ForgeConfigSpec.BooleanValue allowClingToCliff;
 		public final ForgeConfigSpec.BooleanValue allowRoll;
 		public final ForgeConfigSpec.BooleanValue allowVault;
 		public final ForgeConfigSpec.BooleanValue allowWallJump;
@@ -102,7 +104,7 @@ public class ParCoolConfig {
 				allowCrawl = builder.comment("allow Crawl").define("allowCrawl", true);
 				allowDodge = builder.comment("allow Dodge").define("allowDodge", true);
 				allowFastRunning = builder.comment("allow FastRunning").define("allowFastRunning", true);
-				allowGrabCliff = builder.comment("allow GrabCliff").define("allowGrabCliff", true);
+				allowClingToCliff = builder.comment("allow ClingToCliff").define("allowClingToCliff", true);
 				allowRoll = builder.comment("allow Roll").define("allowRoll", true);
 				allowVault = builder.comment("allow Vault").define("allowVault", true);
 				allowWallJump = builder.comment("allow WallJump").define("allow WallJump", true);
